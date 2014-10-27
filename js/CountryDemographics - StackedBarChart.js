@@ -25,10 +25,10 @@ var COUNTRY_area = d3.svg.area()
 			
 var COUNTRY_stack = d3.layout.stack()
 			.values(function(d) { return d.values; });
-
+			
 //Gets called when the page is loaded.
-function init(){
-	chart = d3.select('#vis').append('svg');
+function drawCountryChart(){
+	chart = d3.select('#country').append('svg');
 	//PUT YOUR INIT CODE BELOW
 	
 	y = d3.scale.linear()
@@ -41,14 +41,8 @@ function init(){
 		.attr("height", height + margin.top + margin.bottom)
 	  .append("g")
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-}
-
-//Called when the update button is clicked
-function updateClicked(){
-  chart.selectAll("*").remove();
-  xAxisLabel = getXSelectedOption();
-  yAxisLabel = getYSelectedOption();
-  d3.csv('data/CS4460_Demographics_Country.csv',update, function(error, csvData){
+		
+	d3.csv('data/CS4460_Demographics_Country.csv',update, function(error, csvData){
 	var data = d3.nest()
 	  .key(function(d) {return d[xAxisLabel];})
 	  .rollup(function(d) {
@@ -99,10 +93,18 @@ function updateClicked(){
   });
 }
 
+//Called when the update button is clicked
+function updateClicked(){
+  chart.selectAll("*").remove();
+  xAxisLabel = getXSelectedOption();
+  yAxisLabel = getYSelectedOption();
+  
+}
+
 //Callback for when data is loaded
 function update(d){
   //PUT YOUR UPDATE CODE BELOW
-  return{date: d.date, sales: +d.sales, profit: +d.profit, region: d.region, category: d.category, type: d.type, ceffeination: d.caffeination};
+  return{country: d.country, _2005: +d._2005, _2006: +d._2006, _2007: +d._2007, _2008: +d._2008, _2009: +d._2009, _2010: +d._2010};
 }
 
 // Returns the selected option in the X-axis dropdown. Use d[getXSelectedOption()] to retrieve value instead of d.getXSelectedOption()
