@@ -3,7 +3,7 @@
   <meta charset="UTF-8">
   <title>CoffeeVis</title>
   <script src="lib/d3.js"></script>
-  <script src="js/coffee.js"></script>
+  <script src="js/CountryDemographics - StackedBarChart.js"></script>
   <style>
     .axis path,
     .axis line {
@@ -16,7 +16,7 @@
 	}
   </style>
 </head>
-<body onload="init()"> <!-- init() method defined in coffee.js-->
+<body onload="drawCountryChart(960, 500)"> <!-- init() method defined in coffee.js-->
 
 <div style="margin:30;">
   <div style="display: table-cell; width: 120;">
@@ -39,7 +39,7 @@
   </div>
 </div>
 
-<div id="vis"></div>
+<div id="country"></div>
 
 </body>
 </html>
