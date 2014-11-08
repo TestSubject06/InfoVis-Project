@@ -27,7 +27,7 @@ function drawCountryChart(Width, Height){
 				
 	var stack = d3.layout.stack()
 				.values(function(d) { return d.values; })
-				.order(function(data){console.log(data); return d3.range(data.length);});
+				.order(function(data){return d3.range(data.length);});
 
 
 	chart = d3.select('#country').append('svg');
@@ -49,7 +49,10 @@ function drawCountryChart(Width, Height){
 		
 		data.forEach( function(d) {
 			d.year = parseDate(d.year);
+			
 		});
+		
+		
 		
 		var countries = stack(color.domain().map(function(country) {
 			return{
@@ -98,17 +101,6 @@ function drawCountryChart(Width, Height){
 		chart.append("g")
 			.attr("class", "y axis")
 			.call(yAxis);
-			
-		
-			
-	//	bar.append("text")
-	//      .attr("x", x.rangeBand() / 2)
-	//      .attr("y", function(d) { return y(d.values) + 3; })
-	//      .attr("dy", ".75em")
-	//	  .style("fill", "white")
-	//	  .style("font", "10px sans-serif")
-	//	  .style("text-anchor", "middle")
-	//	.text(function(d) { return d.values; });
 	});
 	
 }
