@@ -20,7 +20,7 @@ function drawcompletionrate(Width, Height){
 
   
   d3.csv('data/QueryHighSchoolData.csv', function(error, data){
-	// parse, compute, and sort the data. save it to local var
+	// sort and get the sum of sales by region and store each object in salesbyregion
 	highSchoolsGraduated = d3.nest()
 				.key(function(d)	{ return d["High School"];})
 				.sortKeys(d3.ascending)
@@ -49,7 +49,7 @@ function drawcompletionrate(Width, Height){
 		//console.log(highSchoolsGraduated[i].key);
 		highSchools.push(schools);
 	}
-	//console.log(highSchools);
+	console.log(highSchools);
 
 	// Transpose the data into layers by status
 	highSchools = d3.layout.stack()(["graduated", "notGraduated"].map(function(status){
@@ -78,24 +78,38 @@ function drawcompletionrate(Width, Height){
  	  	.attr("y", function(d) {return -y(d.y0) - y(d.y);})
  	  	.attr("height", function(d) {return y(d.y);})
  	  	.attr("width", x.rangeBand())
- 	 	.on("mouseover", function(d) {console.log("Yeah"); hover.data(d); hover.style("visibility", "visible");});
+ 	 	.on("mouseover", function(d) {
+ 	 		//d3.select(this.parentNode)
+ 	 			svg.append("text")
+ 	 			.attr("x", d3.mouse(this)[0])
+ 	 			.attr("y", d3.mouse(this)[1]-15)
+ 	 			.style("text-anchor", "middle")
+ 	 			.style("font", "10px sans-serif")
+ 	 			.style("fill", "black")
+ 	 			.text(function() {return d.x + " " + (d.y) ;});
+ 	 	})
+ 	 	.on("mouseout", function(d){
+ 	 		svg.selectAll("text").remove();
+ 	 	});
  	
- 	var hover = d3.selectAll("rect")
- 		.append("div")
- 		.style("position", "absolute")
- 		.style("z-index", "10")
- 		.style("visibility", "visible")
- 		.text("test");
+ 	// var hover = d3.selectAll("rect")
+ 	// 	.append("div")
+ 	// 	.style("position", "absolute")
+ 	// 	.style("z-index", "10")
+ 	// 	.style("visibility", "visible")
+ 	// 	.text("test");
 
  	// Add a label per high school
- 	var label = svg.selectAll("text")
- 		.data(x.domain())
- 	  .enter().append("svg:text")
- 	  	.attr("x", function(d) {return x(d) + x.rangeBand() / 2;})
- 	  	.attr("y", 6)
- 	  	.attr("text-anchor", "middle")
- 	  	.attr("dy", ".71em")
- 	  	.text(function(d) {return d.data;});
+ 	// var label = svg.selectAll("text")
+ 	// 	.data(x.domain())
+ 	//   .enter().append("text")
+ 	//   	//.attr("x", function(d) {return x(d) + x.rangeBand() / 2;})
+ 	//   	//.attr("y", 6)
+ 	//   	.style("text-anchor", "middle")
+ 	//   	//.attr("dy", ".71em")
+ 	//   	.style("fill", "blue")
+ 	//   	.style("transform", "( " + function(d) {return x(d) + x.rangeBand() / 2;} + ",6)")
+ 	//   	.text(function(d) {return d.data;});
  	// Add y-axis rules.
  	var rule = svg.selectAll("g.rule")
  		.data(y.ticks(5))
