@@ -49,16 +49,13 @@ function drawCountryChart(Width, Height){
 		
 		data.forEach( function(d) {
 			d.year = parseDate(d.year);
-			
 		});
-		
-		
 		
 		var countries = stack(color.domain().map(function(country) {
 			return{
 				country: country,
 				values: data.map(function(d) {
-					return {year: d.year, y: +d[country]};
+					return {year: d.year, y: (country!="United States of America" && country!="China" && country != "India" && country != "Korea, Republic of (South)")?+d[country]:0};
 				})
 			};
 		}));
@@ -66,7 +63,7 @@ function drawCountryChart(Width, Height){
 		y.domain([0, d3.max(data, function(d){
 			var sum = 0;
 			for (var property in d) {
-				if(property != "year")
+				if(property != "year" && property != "United States of America" && property!="China" && property != "India" && property != "Korea, Republic of (South)")
 					sum += +d[property];
 			}
 			return sum;
@@ -81,7 +78,9 @@ function drawCountryChart(Width, Height){
 		bar.append("path")
 			.attr("class", "area")
 			.attr("d", function(d) { return area(d.values); })
-			.style("fill", function(d) {return color(d.country);});
+			.style("fill", function(d) {return color(d.country);})
+			.append("title")
+			.text(function(d){return d.country;});
 		
 		xAxis = d3.svg.axis()
 			.scale(x)

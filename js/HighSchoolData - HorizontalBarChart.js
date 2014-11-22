@@ -1,5 +1,6 @@
 //Gets called when the page is loaded.
-function drawSchoolGPAChart(Width, Height){
+var selectedHighSchool = "";
+function drawSchoolGPAChart(Width, Height, SmallChart){
 	var chart;
 	var height = Height;
 	var width = Width;
@@ -7,7 +8,7 @@ function drawSchoolGPAChart(Width, Height){
 	var x;
 	var xAxisLabel;
 	var yAxisLabel;
-	var margin = {top: 15, right: 15, bottom: 30, left: 110};
+	var margin = {top: 10, right: 10, bottom: SmallChart?10:30, left: SmallChart?10:150};
 	var chartWidth = width - margin.left - margin.right;
 	var chartHeight = height - margin.top - margin.bottom;
 	var color = d3.scale.category10();
@@ -18,18 +19,12 @@ function drawSchoolGPAChart(Width, Height){
 				.orient("bottom");
 	var yAxis = d3.svg.axis()
 				.scale(y)
-				.orient("left")
-				
-	var stack = d3.layout.stack()
-				.values(function(d) { return d.values; })
-				.order(function(data){console.log(data); return d3.range(data.length);});
-
-
+				.orient("left");
 	chart = d3.select('#HighSchoolGPA').append('svg');
 	//PUT YOUR INIT CODE BELOW
 	
-	y = d3.scale.linear()
-		.range([chartHeight, 0]);
+	y = d3.scale.ordinal()
+		.rangeRoundBands([chartHeight, 0]);
 	
 	x = d3.scale.linear()
 		.range([0, chartWidth]);
@@ -52,40 +47,54 @@ function drawSchoolGPAChart(Width, Height){
 			})
 			.entries(data);
 			
-		averageGPAs.sort(function (a,b){return b.values-a.values});
+		averageGPAs.sort(function (a,b){return a.values-b.values});
 			
-		x.domain(d3.extent(averageGPAs, function(d){return d.values;}));
-		
-		
-		console.log(averageGPAs);
+		x.domain([d3.min(averageGPAs, function(d) {return d.values;})-0.05, d3.max(averageGPAs, function(d){return d.values;})]);
+		y.domain(averageGPAs.map(function(d) {return d.key;}));
 	
 		var bar = chart.selectAll("highSchools")
 			.data(averageGPAs)
 		  .enter().append("g")
 			.attr("class", "highSchools")
-			.attr("transform", function(d, i){return "translate( 0,"+i*3+")";});
+			.attr("transform", function(d, i){return "translate( 0,"+y(d.key)+")";});
 			
 		bar.append("rect")
 			.attr("width", function(d){return x(d.values);})
-			.attr("height", "2");
+			.attr("height", y.rangeBand())
+			.attr("fill", function(d){return (d.key == selectedHighSchool) ? "steelblue" : "black";})
+			.on("mouseover", function(){
+				d3.select(this)
+					.attr("fill", "red")
+					
+				d3.select(this.parentNode)
+					.append("text")
+					.attr("transform", "translate(-5, 5)")
+					.style("text-anchor", "end")
+					.style("font", "10px sans-serif")
+					.style("fill", "blue")
+					.text(function(d){return d.key;});
+			})
+			.on("mouseout", function(){
+				d3.select(this)
+					.attr("fill", function(d){return (d.key == selectedHighSchool) ? "steelblue" : "black";});
+					
+				bar.select("text").remove();
+			})
+			.on("mousedown", function(){
+				d3.select(this)
+					.attr("fill", function(d){selectedHighSchool = d.key; return "steelblue"});
+				bar.selectAll("rect").attr("fill", function(d){return (d.key == selectedHighSchool) ? "steelblue" : "black";});
+			});
 		
 		xAxis = d3.svg.axis()
 			.scale(x)
 			.orient("bottom")
 			.ticks(10);
-			
-		yAxis = d3.svg.axis()
-			.scale(y)
-			.orient("left")
-			.ticks(10);
-			
+		if(!SmallChart)	
 		chart.append("g")
 			.attr("class", "x axis")
 			.attr("transform", "translate(0," + chartHeight + ")")
 			.call(xAxis);
 			
-		chart.append("g")
-			.attr("class", "y axis")
-			.call(yAxis);
 	});
 }
