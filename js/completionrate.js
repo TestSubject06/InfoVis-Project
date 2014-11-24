@@ -18,7 +18,7 @@ function drawcompletionrate(Width, Height){
   	  .append("svg:g")
   	  	.attr("transform", "translate(" + p[3] + "," + (h - p[2]) + ")");
 
-  
+ 
   d3.csv('data/QueryHighSchoolData.csv', function(error, data){
 	// sort and get the sum of sales by region and store each object in salesbyregion
 	highSchoolsGraduated = d3.nest()
@@ -90,6 +90,16 @@ function drawcompletionrate(Width, Height){
  	 	})
  	 	.on("mouseout", function(d){
  	 		svg.selectAll("text").remove();
+
+ 	 	svg.append("text")
+         .text("Number of graduated and not graduated students in Georgia Institute of Technology by high schools")
+         .attr("x", 100)
+         .attr("y", 13);
+
+   		svg.append("text")
+         .text("Hover over bar to see exact value, color: Grey = Graduated, Blue = Not Graduated")
+         .attr("x", 100)
+         .attr("y", 27);
  	 	});
  	
  	// var hover = d3.selectAll("rect")
