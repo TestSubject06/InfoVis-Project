@@ -20,7 +20,7 @@ function drawcompletionrate(Width, Height){
 
  
   d3.csv('data/QueryHighSchoolData.csv', function(error, data){
-	// sort and get the sum of sales by region and store each object in salesbyregion
+	// sort and get the number of graduated for each school using rollup function
 	highSchoolsGraduated = d3.nest()
 				.key(function(d)	{ return d["High School"];})
 				.sortKeys(d3.ascending)
