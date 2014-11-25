@@ -84,6 +84,18 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 				d3.select(this)
 					.attr("fill", function(d){selectedHighSchool = d.key; return "steelblue"});
 				bar.selectAll("rect").attr("fill", function(d){return (d.key == selectedHighSchool) ? "steelblue" : "black";});
+
+				chart.transition()
+					.duration(750)
+					.attr("transform", "scale(0.35)")
+					.each("end", displaySmallGraph);
+				
+				d3.select('#HighSchoolGPA').select('svg')
+					.transition()
+					.duration(900)
+					.attr("height", 220)
+					.attr("width", 300)
+					.remove();
 			});
 		
 		xAxis = d3.svg.axis()
@@ -97,4 +109,8 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 			.call(xAxis);
 			
 	});
+}
+
+function displaySmallGraph(){
+	drawSchoolGPAChart(300, 220, true);
 }
