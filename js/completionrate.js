@@ -1,6 +1,8 @@
 //Gets called when the page is loaded.
 var HighSchoolGraduatedData = null;
+var HighSchoolGraduationRects = new Object();
 function drawcompletionrate(Width, Height, SmallChart){
+	HighSchoolGraduationRects = new Object();
 	var highSchoolsGraduated;
 	var highSchoolsNotGraduated;
 	var stack;
@@ -28,7 +30,7 @@ function drawcompletionrate(Width, Height, SmallChart){
 		var rect = status.selectAll("rect")
 			.data(Object)
 		  .enter().append("svg:rect")
-			.attr("x", function(d) {return x(d.x);})
+			.attr("x", function(d) {(HighSchoolGraduationRects[d.x]==undefined) ? HighSchoolGraduationRects[d.x] = [this] : HighSchoolGraduationRects[d.x].push(this); return x(d.x);})
 			.attr("y", function(d) {return -y(d.y0) - y(d.y);})
 			.attr("height", function(d) {return y(d.y);})
 			.attr("width", x.rangeBand())
@@ -43,13 +45,14 @@ function drawcompletionrate(Width, Height, SmallChart){
 						.text(function() {return d.x + " " + (d.y) ;});
 				}
 				highlightedHighSchool = d3.select(this)[0]['0'].__data__.x;
-				masterBars.selectAll("rect")
-					.attr("fill", function(d){return d.x==highlightedHighSchool?(d.y0==0?d3.rgb(z(0)).brighter().brighter():d3.rgb(z(1)).brighter()):(d.y0==0?z(0):z(1))})
-					.attr("stroke", function(d){return d.x==highlightedHighSchool?(d.y0==0?d3.rgb(z(0)).brighter():d3.rgb(z(1))):(d.y0==0?d3.rgb(z(0)).darker():d3.rgb(z(1)).darker());});
-				updateGraphs();
+				//masterBars.selectAll("rect")
+					//.attr("fill", function(d){return d.x==highlightedHighSchool?(d.y0==0?d3.rgb(z(0)).brighter().brighter():d3.rgb(z(1)).brighter()):(d.y0==0?z(0):z(1))})
+					//.attr("stroke", function(d){return d.x==highlightedHighSchool?(d.y0==0?d3.rgb(z(0)).brighter():d3.rgb(z(1))):(d.y0==0?d3.rgb(z(0)).darker():d3.rgb(z(1)).darker());});
+				updateGraphs(d.x);
 			})
 			.on("mouseout", function(d){
 				masterBars.selectAll("text").remove();
+				updateGraphs(null, d.x);
 			});
 			// .on("click", function(d){
 			// 	sortChart();
@@ -218,11 +221,40 @@ function drawcompletionrate(Width, Height, SmallChart){
 	}
 }
 
-function updateGraphs(){
-	d3.select('#HighSchoolGPA').select('svg').selectAll('rect')
-		.attr("fill", function(d){return (highlightedHighSchool==d.key) ? "red" : "black";});
+function updateGraphs(newHover = null, oldHover = null, newSelection = null){
+	if(newHover != null){
+		SATRectContainer[newHover].forEach(function(g, i){
+			d3.select(g)
+				.attr("fill", d3.rgb(d3.scale.category10().domain([0, 1, 2])(i)).brighter().brighter());
+		});
 		
-	d3.select('#completion').select('svg').selectAll('rect')
-		.attr("fill", function(d){return d.x==highlightedHighSchool?(d.y0==0?d3.rgb("#fd8d3c").brighter().brighter():d3.rgb("#9ecae1").brighter()):(d.y0==0?"#fd8d3c":"#9ecae1")})
-		.attr("stroke", function(d){return d.x==highlightedHighSchool?(d.y0==0?d3.rgb("#fd8d3c").brighter():d3.rgb("#9ecae1")):(d.y0==0?d3.rgb("#fd8d3c").darker():d3.rgb("#9ecae1").darker());});
+		HighSchoolGraduationRects[newHover].forEach(function(g, i){
+			d3.select(g)
+				.attr("fill", d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"])(i)).brighter())
+				.attr("stroke", d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"])(i)));
+		});
+		
+		HighSchoolGPARects[newHover].forEach(function(g, i){
+			d3.select(g)
+				.attr("fill", "red");
+		});
+	}
+	
+	if(oldHover != null){
+		SATRectContainer[oldHover].forEach(function(g, i){
+			d3.select(g)
+				.attr("fill", d3.rgb(d3.scale.category10().domain([0, 1, 2])(i)));
+		});
+		
+		HighSchoolGraduationRects[oldHover].forEach(function(g, i){
+			d3.select(g)
+				.attr("fill", d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)))
+				.attr("stroke", d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)).darker());
+		});
+		
+		HighSchoolGPARects[oldHover].forEach(function(g, i){
+			d3.select(g)
+				.attr("fill", "black");
+		});
+	}
 }

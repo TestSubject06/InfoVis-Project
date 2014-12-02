@@ -1,5 +1,7 @@
 var HighSchoolSATRolledup = null;
+var SATRectContainer = new Object();
 function drawHighSchoolSAT(Width, Height, SmallChart){
+	SATRectContainer = new Object();
 	var chart;
 	var margin = SmallChart ? {top:5, bottom:5, left:5, right:5} : {top:10, bottom:40, left:40, right:10};
 	var chartWidth = Width-margin.left-margin.right;
@@ -47,12 +49,16 @@ function drawHighSchoolSAT(Width, Height, SmallChart){
 		var rect = status.selectAll("rect")
 			.data(Object)
 		  .enter().append("rect")
-			.attr("x", function(d) {return x(d.x);})
+			.attr("x", function(d) {(SATRectContainer[d.x]==undefined) ? SATRectContainer[d.x] = [this] : SATRectContainer[d.x].push(this); return x(d.x);})
 			.attr("y", function(d) {return y(d.y0);})
 			.attr("height", function(d) {return y(d.y);})
 			.attr("width", x.rangeBand())
 			.on("mouseover", function(d) {
-				/* if(!SmallChart){
+				//SATRectContainer[d.x].forEach(function(g, i){
+					//d3.select(g)
+						//.attr("fill", d3.rgb(color(i)).brighter().brighter());
+				//});
+				if(!SmallChart){
 					masterBars.append("text")
 						.attr("x", d3.mouse(this)[0])
 						.attr("y", d3.mouse(this)[1]-15)
@@ -62,13 +68,16 @@ function drawHighSchoolSAT(Width, Height, SmallChart){
 						.text(function() {return d.x + " " + (d.y) ;});
 				}
 				highlightedHighSchool = d3.select(this)[0]['0'].__data__.x;
-				masterBars.selectAll("rect")
-					.attr("fill", function(d){return d.x==highlightedHighSchool?(d.y0==0?d3.rgb(z(0)).brighter().brighter():d3.rgb(z(1)).brighter()):(d.y0==0?z(0):z(1))})
-					.attr("stroke", function(d){return d.x==highlightedHighSchool?(d.y0==0?d3.rgb(z(0)).brighter():d3.rgb(z(1))):(d.y0==0?d3.rgb(z(0)).darker():d3.rgb(z(1)).darker());});
-				updateGraphs(); */
+				
+				updateGraphs(d.x); 
 			})
 			.on("mouseout", function(d){
 				//masterBars.selectAll("text").remove();
+				//SATRectContainer[d.x].forEach(function(g, i){
+					//d3.select(g)
+						//.attr("fill", color(i));
+				//});
+				updateGraphs(null, d.x);
 			});
 	}
 		
