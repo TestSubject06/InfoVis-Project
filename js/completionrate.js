@@ -1,5 +1,3 @@
-
-
 //Gets called when the page is loaded.
 function drawcompletionrate(Width, Height){
 	var highSchoolsGraduated;
@@ -10,7 +8,7 @@ function drawcompletionrate(Width, Height){
   	var p = [20, 50, 30, 20];
   	var x = d3.scale.ordinal().rangeRoundBands([0, w - p[1] - p[3]]);
   	var y = d3.scale.linear().range([0, h - p[0] - p[2]]);
-  	var z = d3.scale.ordinal().range(["darkgray", "lightblue"]);
+  	var z = d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]);
 
   	var svg = d3.select('#completion').append('svg:svg')
   		.attr("width", w)
@@ -22,6 +20,8 @@ function drawcompletionrate(Width, Height){
   	var globalInfo = new Array();
   	var temp = {school: "", applied: "", accepted: "", percentageAccepted:"" };
   	var temp_applied, temp_accepted, temp_percentage_accepted;
+	
+	/*
   	d3.csv('data/CS4460_HighSchoolAcceptanceRates_v2.csv', function(error, data){
   		temp_applied = d3.nest()
 				.key(function(d)	{ return d["High School Description"];})
@@ -54,9 +54,9 @@ function drawcompletionrate(Width, Height){
 		}
 		console.log(globalInfo);
 	});
-  	
+  	*/
  
-  d3.csv('data/QueryHighSchoolData.csv', function(error, data){
+  d3.tsv('data/CS4460_QueryHighSchoolData.tsv',function(error, data){
 	// sort and get the number of graduated for each school using rollup function
 	highSchoolsGraduated = d3.nest()
 				.key(function(d)	{ return d["High School"];})
@@ -101,7 +101,8 @@ function drawcompletionrate(Width, Height){
  	y.domain([0, d3.max(highSchools[highSchools.length - 1], function(d) {return d.y0 + d.y;})]);
 
  	// Add a group for each status
- 	var status = svg.selectAll("g.status")
+	var masterBars = svg.append("g");
+ 	var status = masterBars.selectAll("g.status")
  		.data(highSchools)
  	  .enter().append("svg:g")
  	  	.attr("class", "status")
@@ -117,7 +118,7 @@ function drawcompletionrate(Width, Height){
  	  	.attr("width", x.rangeBand())
  	 	.on("mouseover", function(d) {
  	 		//d3.select(this.parentNode)
- 	 			svg.append("text")
+ 	 			masterBars.append("text")
  	 			.attr("x", d3.mouse(this)[0])
  	 			.attr("y", d3.mouse(this)[1]-15)
  	 			.style("text-anchor", "middle")
@@ -126,17 +127,7 @@ function drawcompletionrate(Width, Height){
  	 			.text(function() {return d.x + " " + (d.y) ;});
  	 	})
  	 	.on("mouseout", function(d){
- 	 		svg.selectAll("text").remove();
- 	 	
- 	 	svg.append("text")
-         .text("Number of graduated and not graduated students in Georgia Institute of Technology by high schools")
-         .attr("x", 100)
-         .attr("y", 13);
-
-   		svg.append("text")
-         .text("Hover over bar to see exact value, color: Grey = Graduated, Blue = Not Graduated")
-         .attr("x", 100)
-         .attr("y", 27);
+ 	 		masterBars.selectAll("text").remove();
  	 	});
  	 	// .on("click", function(d){
  	 	// 	sortChart();
@@ -192,9 +183,16 @@ function drawcompletionrate(Width, Height){
  		.attr("x", w - p[1] - p[3] + 6)
  		.attr("dy", ".35em")
  		.text(d3.format(",d"));
+		
+	svg.append("text")
+		 .text("Number of graduated and not graduated students in Georgia Institute of Technology by high schools")
+		 .attr("x", 70)
+		 .attr("y", 13);
 
- 	
-	
+	svg.append("text")
+	 .text("Hover over bar to see exact value, color: Grey = Graduated, Blue = Not Graduated")
+	 .attr("x", 100)
+	 .attr("y", 27);
   });
 }
 
