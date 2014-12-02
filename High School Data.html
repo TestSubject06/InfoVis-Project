@@ -7,12 +7,18 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <title>
+        <script src="lib/d3.js"></script>
+        <script src="js/completionrate.js"></script>
+        <script src="js/CountryDemographics - StackedBarChart.js"></script>
+        <script src="js/AgeDistribution Draft.js.js"></script>
     </title>
     <link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"
     rel="stylesheet">
+    <script src="jquery-1.11.1.min.js"></script>
   </head>
   
   <body>
+    <link rel="hscss" href="css/hscss.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"
     >
     </script>
@@ -34,21 +40,45 @@
     <div>
       Data Description (Fall 2005 - Fall 2010)
     </div>
-    <div class="panel panel-default">
+    <div id="GPA" class="panel panel-default">
       <div class="panel-heading">
         <h3 class="panel-title">
-          High School GPA&nbsp;
+          High School GPA
         </h3>
       </div>
       <div class="panel-body">
         <div>
-        </div>
-        <div>
-          Horizontal Bar Graph
+          <script src="lib/d3.js"></script>
+          <script src="js/AgeDistribution%20Draft.js"></script>
+          <style>
+            .axis path,
+            .axis line {
+              fill: none;
+              stroke: #000;
+              shape-rendering: crispEdges;
+            }
+            .axis text{
+              font: 12px sans-serif;
+            }
+          </style>
+
+          <div onload="drawCountryChart(960, 500); drawSchoolGPAChart(1000, 600, false);">
+          </div>
         </div>
       </div>
     </div>
-    <div class="panel panel-default">
+    <div id="SAT" class="panel panel-default">
+      <!--<script>-->
+        <!--$("#SAT").click(function() {-->
+          <!--$('body').removeClass();-->
+          <!--$('body').addClass('class1');-->
+        <!--});-->
+
+        <!--$("#GPA").click(function() {-->
+          <!--$('body').removeClass();-->
+          <!--$('body').addClass('class2');-->
+        <!--});-->
+      <!--</script>-->
       <div class="panel-heading">
         <h3 class="panel-title">
           SAT Scores
@@ -60,7 +90,7 @@
         </div>
       </div>
     </div>
-    <div class="panel panel-default">
+    <div id = "completionrate" class="panel panel-default">
       <div class="panel-heading">
         <h3 class="panel-title">
           Completion Rate per School
