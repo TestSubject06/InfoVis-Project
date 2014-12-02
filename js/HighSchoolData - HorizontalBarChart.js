@@ -1,5 +1,6 @@
 //Gets called when the page is loaded.
-var selectedHighSchool = "";
+var selectedHighSchools = [""];
+var highlightedHighSchool = "";
 var HighSchoolAverageGPARollupData = null;
 function drawSchoolGPAChart(Width, Height, SmallChart){
 	var chart;
@@ -9,7 +10,7 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 	var x;
 	var xAxisLabel;
 	var yAxisLabel;
-	var margin = {top: 10, right: 10, bottom: SmallChart?10:30, left: SmallChart?10:150};
+	var margin = SmallChart ? {top:5, right:5, bottom:5, left:5} : {top: 10, right: 10, bottom: 30, left: 150};
 	var chartWidth = width - margin.left - margin.right;
 	var chartHeight = height - margin.top - margin.bottom;
 	var color = d3.scale.category10();
@@ -25,7 +26,7 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 	//PUT YOUR INIT CODE BELOW
 	
 	y = d3.scale.ordinal()
-		.rangeRoundBands([chartHeight, 0]);
+		.rangeBands([chartHeight, 0]);
 	
 	x = d3.scale.linear()
 		.range([0, chartWidth]);
@@ -65,7 +66,7 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 		bar.append("rect")
 			.attr("width", function(d){return x(d.values);})
 			.attr("height", y.rangeBand())
-			.attr("fill", function(d){return (d.key == selectedHighSchool) ? "steelblue" : "black";})
+			.attr("fill", function(d){return (selectedHighSchools.indexOf(d.key)>=0) ? "steelblue" : "black";})
 			.on("mouseover", function(){
 				d3.select(this)
 					.attr("fill", "red")
@@ -80,14 +81,14 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 			})
 			.on("mouseout", function(){
 				d3.select(this)
-					.attr("fill", function(d){return (d.key == selectedHighSchool) ? "steelblue" : "black";});
+					.attr("fill", function(d){return (selectedHighSchools.indexOf(d.key)>=0) ? "steelblue" : "black";});
 					
 				bar.select("text").remove();
 			})
 			.on("mousedown", function(){
 				d3.select(this)
-					.attr("fill", function(d){selectedHighSchool = d.key; return "steelblue"});
-				bar.selectAll("rect").attr("fill", function(d){return (d.key == selectedHighSchool) ? "steelblue" : "black";});
+					.attr("fill", function(d){selectedHighSchools[0] = d.key; return "steelblue"});
+				bar.selectAll("rect").attr("fill", function(d){return (selectedHighSchools.indexOf(d.key)>=0) ? "steelblue" : "black";});
 
 				chart.transition()
 					.duration(750)
@@ -108,15 +109,16 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 					.style("top", "50px");
 			});
 		
-		xAxis = d3.svg.axis()
-			.scale(x)
-			.orient("bottom")
-			.ticks(10);
-		if(!SmallChart)	
-		chart.append("g")
-			.attr("class", "x axis")
-			.attr("transform", "translate(0," + chartHeight + ")")
-			.call(xAxis);
+		if(!SmallChart)	{
+			xAxis = d3.svg.axis()
+				.scale(x)
+				.orient("bottom")
+				.ticks(10);
+			chart.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + chartHeight + ")")
+				.call(xAxis);
+		}
 			
 	});
 	}else{
@@ -132,7 +134,7 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 		bar.append("rect")
 			.attr("width", function(d){return x(d.values);})
 			.attr("height", y.rangeBand())
-			.attr("fill", function(d){return (d.key == selectedHighSchool) ? "steelblue" : "black";})
+			.attr("fill", function(d){return (selectedHighSchools.indexOf(d.key)>=0) ? "steelblue" : "black";})
 			.on("mouseover", function(){
 				d3.select(this)
 					.attr("fill", "red")
@@ -147,15 +149,17 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 			})
 			.on("mouseout", function(){
 				d3.select(this)
-					.attr("fill", function(d){return (d.key == selectedHighSchool) ? "steelblue" : "black";});
+					.attr("fill", function(d){return (selectedHighSchools.indexOf(d.key)>=0) ? "steelblue" : "black";});
 					
 				bar.select("text").remove();
 			})
 			.on("mousedown", function(){
 				d3.select(this)
-					.attr("fill", function(d){selectedHighSchool = d.key; return "steelblue"});
-				bar.selectAll("rect").attr("fill", function(d){return (d.key == selectedHighSchool) ? "steelblue" : "black";});
+					.attr("fill", function(d){selectedHighSchools[0] = d.key; return "steelblue"});
+				bar.selectAll("rect").attr("fill", function(d){return (selectedHighSchools.indexOf(d.key)>=0) ? "steelblue" : "black";});
 
+				
+				//Testing the transitions for the whole fucking div
 				chart.transition()
 					.duration(750)
 					.attr("transform", "scale(0.35)")
@@ -175,18 +179,20 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 					.style("top", "50px");
 			});
 		
-		xAxis = d3.svg.axis()
-			.scale(x)
-			.orient("bottom")
-			.ticks(10);
-		if(!SmallChart)	
-		chart.append("g")
-			.attr("class", "x axis")
-			.attr("transform", "translate(0," + chartHeight + ")")
-			.call(xAxis);
+		if(!SmallChart)	{
+			xAxis = d3.svg.axis()
+				.scale(x)
+				.orient("bottom")
+				.ticks(10);
+			
+			chart.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + chartHeight + ")")
+				.call(xAxis);
+		}
 	}
 }
 
 function displaySmallGraph(){
-	drawSchoolGPAChart(300, 220, true);
+	drawSchoolGPAChart(300, 300, true);
 }

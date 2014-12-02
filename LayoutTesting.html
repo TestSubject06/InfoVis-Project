@@ -43,7 +43,7 @@
 </style>
 </head>
 
-<body onload="drawcompletionrate(800, 600); drawSchoolGPAChart(300, 300, true)">
+<body onload="drawcompletionrate(300, 300, true); drawSchoolGPAChart(300, 300, true)">
 
 <div id="header">
 Demographics / Highschools
@@ -51,15 +51,15 @@ Demographics / Highschools
 
 <div id="sidegraphs">
 	<div class="minigraph">
-		<div id="HighSchoolGPA" style="position:absolute"></div>
+		<div id="completion" style="position:absolute"></div>
 	</div>
 	<div class="minigraph">
-		<div id="HighSchoolSATScores"></div>
+		<div id="HighSchoolGPA"></div>
 	</div>
 </div>
 
 <div id="MainGraph">
-	<div id="completion" style="position:absolute"></div>
+	<div id="HighSchoolSATScores" style="position:absolute"></div>
 </div>
 
 <div style="clear: both; width: 1100px;"></div>
