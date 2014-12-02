@@ -60,19 +60,20 @@ function drawAgeChart(Width, Height) {
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")")
             .call(xAxis)
-            .style("font-size", 12);
+            .style("font-size", "12px");
 
 
         svg.append("g")
             .attr("class", "y axis")
             .call(yAxis)
+            .style("font-size", "12px")
             .append("text")
             .attr("transform", "rotate(-90)")
             .attr("y", 2.5)
             .attr("dy", ".5em")
             .style("text-anchor", "end")
             .text("Number of Students")
-            .style("font-size", 12);
+            .style("font-size", "12px");
 
 
         var age = svg.selectAll(".age")
@@ -118,7 +119,7 @@ function drawAgeChart(Width, Height) {
             .attr("y", 9)
             .attr("dy", ".35em")
             .style("text-anchor", "end")
-            .style("font-size", 12)
+            .style("font-size", "12px")
             .text(function (d) {
                 return d;
             });

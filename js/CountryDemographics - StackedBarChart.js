@@ -95,11 +95,13 @@ function drawCountryChart(Width, Height){
 		chart.append("g")
 			.attr("class", "x axis")
 			.attr("transform", "translate(0," + chartHeight + ")")
-			.call(xAxis);
+			.call(xAxis)
+            .style("font-size", "12px");
 			
 		chart.append("g")
 			.attr("class", "y axis")
-			.call(yAxis);
+			.call(yAxis)
+            .style("font-size", "12px");
 	});
 	
 }
