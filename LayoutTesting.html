@@ -7,6 +7,8 @@
 <script src="lib/d3.js"></script>
 <script src="js/completionrate.js"></script>
 <script src="js/HighSchoolData - HorizontalBarChart.js"></script>
+<script src="js/HighSchoolData - SATStackedBarChart.js"></script>
+
 <style>
 //My stuff
 #header {
@@ -43,7 +45,7 @@
 </style>
 </head>
 
-<body onload="drawcompletionrate(300, 300, true); drawSchoolGPAChart(300, 300, true)">
+<body onload="drawcompletionrate(800, 600, false); drawSchoolGPAChart(300, 300, true); drawHighSchoolSAT(300, 300, true)">
 
 <div id="header">
 Demographics / Highschools
@@ -51,15 +53,15 @@ Demographics / Highschools
 
 <div id="sidegraphs">
 	<div class="minigraph">
-		<div id="completion" style="position:absolute"></div>
+		<div id="HighSchoolSATScores" style="position:absolute"></div>
 	</div>
 	<div class="minigraph">
-		<div id="HighSchoolGPA"></div>
+		<div id="HighSchoolGPA" style="position:absolute"></div>
 	</div>
 </div>
 
 <div id="MainGraph">
-	<div id="HighSchoolSATScores" style="position:absolute"></div>
+	<div id="completion" style="position:absolute"></div>
 </div>
 
 <div style="clear: both; width: 1100px;"></div>

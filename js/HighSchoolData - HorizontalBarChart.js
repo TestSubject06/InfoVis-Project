@@ -78,6 +78,9 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 					.style("font", "10px sans-serif")
 					.style("fill", "blue")
 					.text(function(d){return d.key;});
+					
+				highlightedHighSchool = d3.select(this)[0]['0'].__data__.key;
+				updateGraphs();
 			})
 			.on("mouseout", function(){
 				d3.select(this)
@@ -146,6 +149,9 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 					.style("font", "10px sans-serif")
 					.style("fill", "blue")
 					.text(function(d){return d.key;});
+				
+				highlightedHighSchool = d3.select(this)[0]['0'].__data__.key;
+				updateGraphs();
 			})
 			.on("mouseout", function(){
 				d3.select(this)

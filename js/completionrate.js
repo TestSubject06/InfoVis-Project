@@ -46,7 +46,7 @@ function drawcompletionrate(Width, Height, SmallChart){
 				masterBars.selectAll("rect")
 					.attr("fill", function(d){return d.x==highlightedHighSchool?(d.y0==0?d3.rgb(z(0)).brighter().brighter():d3.rgb(z(1)).brighter()):(d.y0==0?z(0):z(1))})
 					.attr("stroke", function(d){return d.x==highlightedHighSchool?(d.y0==0?d3.rgb(z(0)).brighter():d3.rgb(z(1))):(d.y0==0?d3.rgb(z(0)).darker():d3.rgb(z(1)).darker());});
-					
+				updateGraphs();
 			})
 			.on("mouseout", function(d){
 				masterBars.selectAll("text").remove();
@@ -202,7 +202,6 @@ function drawcompletionrate(Width, Height, SmallChart){
 				var indexofB = highSchools[0].indexOf(b);
 				return (highSchools[0][indexofA].y + highSchools[1][indexofA].y) - (highSchools[0][indexofB].y + highSchools[1][indexofB].y);
 			});
-			console.log(highSchools);
 				
 			highSchools[1].sort(function(b, a){
 				var indexofA = highSchools[1].indexOf(a);
@@ -217,4 +216,13 @@ function drawcompletionrate(Width, Height, SmallChart){
 	}else{
 		drawTheChart();
 	}
+}
+
+function updateGraphs(){
+	d3.select('#HighSchoolGPA').select('svg').selectAll('rect')
+		.attr("fill", function(d){return (highlightedHighSchool==d.key) ? "red" : "black";});
+		
+	d3.select('#completion').select('svg').selectAll('rect')
+		.attr("fill", function(d){return d.x==highlightedHighSchool?(d.y0==0?d3.rgb("#fd8d3c").brighter().brighter():d3.rgb("#9ecae1").brighter()):(d.y0==0?"#fd8d3c":"#9ecae1")})
+		.attr("stroke", function(d){return d.x==highlightedHighSchool?(d.y0==0?d3.rgb("#fd8d3c").brighter():d3.rgb("#9ecae1")):(d.y0==0?d3.rgb("#fd8d3c").darker():d3.rgb("#9ecae1").darker());});
 }
