@@ -3,6 +3,9 @@ var selectedHighSchools = [""];
 var highlightedHighSchool = "";
 var HighSchoolAverageGPARollupData = null;
 var HighSchoolGPARects = new Object();
+var smallGraphDivName;
+var largeGraphDivName;
+var mainGraph;
 function drawSchoolGPAChart(Width, Height, SmallChart){
 	HighSchoolGPARects = new Object();
 	var chart;
@@ -78,24 +81,10 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 				d3.select(this)
 					.attr("fill", function(d){selectedHighSchools[0] = d.key; return "steelblue"});
 				bar.selectAll("rect").attr("fill", function(d){return (selectedHighSchools.indexOf(d.key)>=0) ? "steelblue" : "black";});
-
-				chart.transition()
-					.duration(750)
-					.attr("transform", "scale(0.35)")
-					.each("end", displaySmallGraph);
 				
-				d3.select('#HighSchoolGPA').select('svg')
-					.transition()
-					.duration(900)
-					.attr("height", 220)
-					.attr("width", 300)
-					.remove();
-					
-				d3.select('#HighSchoolGPA')
-					.transition()
-					.duration(900)
-					.style("left", "50px")
-					.style("top", "50px");
+				if(SmallChart){
+					swapCharts(chart);
+				}
 			});
 		
 		if(!SmallChart)	{
@@ -111,24 +100,24 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 	}
 		
 	if(HighSchoolAverageGPARollupData == null){
-	d3.tsv('data/CS4460_QueryHighSchoolData.tsv',function(error, data){
-		var averageGPAs = d3.nest()
-			.key(function (d){
-				return d["High School"];
-			})
-			.sortKeys(d3.ascending)
-			.rollup(function (d){
-				return d3.mean(d, function(g){
-					return +g.HSGPA;
-				});
-			})
-			.entries(data);
+		d3.tsv('data/CS4460_QueryHighSchoolData.tsv',function(error, data){
+			var averageGPAs = d3.nest()
+				.key(function (d){
+					return d["High School"];
+				})
+				.sortKeys(d3.ascending)
+				.rollup(function (d){
+					return d3.mean(d, function(g){
+						return +g.HSGPA;
+					});
+				})
+				.entries(data);
+				
+			averageGPAs.sort(function (a,b){return a.values-b.values});
 			
-		averageGPAs.sort(function (a,b){return a.values-b.values});
-		
-		HighSchoolAverageGPARollupData = averageGPAs;
-		drawChart();
-	});
+			HighSchoolAverageGPARollupData = averageGPAs;
+			drawChart();
+		});
 	}else{
 		drawChart();
 	}
@@ -136,4 +125,32 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 
 function displaySmallGraph(){
 	drawSchoolGPAChart(300, 300, true);
+}
+
+//Make a set of global function handles, and then define them in each of the functions.
+//Then use these function handles to move the charts around
+//This doesn't work yet
+function swapGraphs(toLargeGraph){
+	//Take the small graph and move it to the big graph spot, and scale it up.
+	toLargeGraph.transition()
+		.duration(750)
+		.attr("transform", "scale(2.6667, 2)")
+		.each("end", displayLargeGraph);
+	
+	//Take the large graph, and move it to the little spot, and scale it down.
+	toSmallGraph.transition()
+		.duration(750)
+		.attr("transform", "scale(0.375, 0.5)")
+		.each("end", displaySmallGraph);
+	d3.select(largeGraphDivName).select('svg')
+		.transition()
+		.duration(750)
+		.attr("height", 300)
+		.attr("width", 300)
+		.remove();
+	d3.select(largeGraphDivName)
+		.transition()
+		.duration(750)
+		.style("left", d3.select('#completion').style("left"))
+		.style("top", d3.select('#completion').style("top"));
 }

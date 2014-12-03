@@ -10,6 +10,15 @@
 <script src="js/HighSchoolData - SATStackedBarChart.js"></script>
 
 <style>
+.axis path,
+.axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+.axis text{
+	font: 12px sans-serif;
+}
 #header {
     background-color:black;
     color:white;
@@ -44,7 +53,7 @@
 </style>
 </head>
 
-<body onload="drawcompletionrate(800, 600, false); drawSchoolGPAChart(300, 300, true); drawHighSchoolSAT(300, 300, true)">
+<body onload="drawcompletionrate(300, 300, true); drawSchoolGPAChart(800, 600, false); drawHighSchoolSAT(300, 300, true); mainGraph='GPA'">
 
 <div id="header">
 Demographics / Highschools
@@ -55,12 +64,12 @@ Demographics / Highschools
 		<div id="HighSchoolSATScores" style="position:absolute"></div>
 	</div>
 	<div class="minigraph">
-		<div id="HighSchoolGPA" style="position:absolute"></div>
+		<div id="completion" style="position:absolute"></div>
 	</div>
 </div>
 
 <div id="MainGraph">
-	<div id="completion" style="position:absolute"></div>
+	<div id="HighSchoolGPA" style="position:absolute"></div>
 </div>
 
 <div style="clear: both; width: 1100px;"></div>
