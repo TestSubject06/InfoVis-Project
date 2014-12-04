@@ -53,6 +53,34 @@ function drawcompletionrate(Width, Height, SmallChart){
 			.on("mouseout", function(d){
 				masterBars.selectAll("text").remove();
 				updateGraphs(null, d.x);
+			})
+			.on("mousedown", function(d){
+				if(SmallChart){
+					switch(mainGraph){
+						case "HighSchoolGPA":
+							CompletionGraphTransition(true);
+							mainGraph = "completion";
+							GPAGraphTransition(false);
+						break;
+						case "HighSchoolSATScores":
+							CompletionGraphTransition(true);
+							mainGraph = "completion";
+							SATGraphTransition(false);
+						break;
+					}
+					
+				}
+			});
+			rect.append("title").text(function(d){
+				var finalString = d.x + "\n";
+				var total = 0;
+				HighSchoolGraduationRects[d.x].forEach(function(g, i){
+					finalString += i==0?"Number of Non-graduated: ":"Number of Graduated: ";
+					finalString += d3.select(g)[0]['0'].__data__.y + (d3.select(g)[0]['0'].__data__.y==0?" :(":"") +"\n";
+					total += d3.select(g)[0]['0'].__data__.y;
+				});
+				finalString += "Total students: " + total + "\n";
+				return finalString + globalInfo[((d.x == "North Springs Charter Hs") ? "North Springs High School":d.x)].percentageAccepted + "% Acceptance rate";
 			});
 			// .on("click", function(d){
 			// 	sortChart();
@@ -122,51 +150,49 @@ function drawcompletionrate(Width, Height, SmallChart){
 		}
 	}
 
-  	var svg = d3.select('#completion').append('svg:svg')
+  	var svg = d3.select('#completion').append('svg')
   		.attr("width", w)
   		.attr("height", h)
-  	  .append("svg:g")
+  	  .append("g")
   	  	.attr("transform", "translate(" + p[3] + "," + (h - p[2]) + ")");
-  	
-  	// initialize, create and populate the globalTemp array.
-  	var globalInfo = new Array();
-  	var temp = {school: "", applied: "", accepted: "", percentageAccepted:"" };
-  	var temp_applied, temp_accepted, temp_percentage_accepted;
-	
-	/*
-  	d3.csv('data/CS4460_HighSchoolAcceptanceRates_v2.csv', function(error, data){
-  		temp_applied = d3.nest()
-				.key(function(d)	{ return d["High School Description"];})
-				.sortKeys(d3.ascending)
-				.rollup(function(d){
-				 return d3.sum(d, function(g)	{return g.Applied;});
-				}).entries(data);
-				console.log(temp_applied);
-				console.log(temp_applied.length);
-		temp_accepted = d3.nest()
-				.key(function(d)	{ return d["High School Description"];})
-				.sortKeys(d3.ascending)
-				.rollup(function(d){
-				 return d3.sum(d, function(g)	{return g.Accepted;});
-				}).entries(data);
-				console.log(temp_accepted);
-				console.log(temp_accepted.length);
-		temp_percentage_accepted = d3.nest()
-				.key(function(d)	{ return d["High School Description"];})
-				.sortKeys(d3.ascending)
-				.rollup(function(d){
-				 return d3.sum(d, function(g)	{return g["Percentage Accepted"];});
-				}).entries(data);
-				console.log(temp_percentage_accepted);
-				console.log(temp_percentage_accepted.length);
-		// populate the globalInfo array
-		for(i = 0; i < temp_applied.length; i++){
-			temp = {school:temp_applied[i].key, applied: temp_applied[i].values, accepted: temp_accepted[i].values, percentageAccepted: temp_percentage_accepted[i].values};
-			globalInfo.push(temp);
+		
+	var redrawBig = function(){
+		drawcompletionrate(800, 600, false);
+	};
+	var redrawSmall = function(){
+		drawcompletionrate(300, 300, true);
+	};
+	CompletionGraphTransition = function(toBigGraph){
+		if(!toBigGraph){
+			d3.select("#completion").select('svg').transition()
+				.duration(750)
+				.attr("height", 300)
+				.attr("width", 300)
+				.attr("transform", "scale(0.375, 0.5)")
+				.each("end", redrawSmall)
+				.remove();
+			d3.select("#completion")
+				.transition()
+				.duration(750)
+				.style("left", d3.select('#'+mainGraph).style("left"))
+				.style("top", d3.select('#'+mainGraph).style("top"));
+		}else{
+			d3.select("#completion").select('svg').transition()
+				.duration(750)
+				.attr("height", 600)
+				.attr("width", 800)
+				.attr("transform", "scale(2.6666, 2)")
+				.each("end", redrawBig)
+				.remove();
+			d3.select("#completion")
+				.transition()
+				.duration(750)
+				.style("left", '300px')
+				.style("top", '35px');
 		}
-		console.log(globalInfo);
-	});
-  	*/
+		console.log(d3.select('#'+mainGraph).style("top"));
+	}
+  	
 	if(HighSchoolGraduatedData == null){
 		d3.tsv('data/CS4460_QueryHighSchoolData.tsv',function(error, data){
 			// sort and get the number of graduated for each school using rollup function

@@ -22,15 +22,57 @@ function drawHighSchoolSAT(Width, Height, SmallChart){
 	chart = d3.select('#HighSchoolSATScores').append('svg');
 	
 	x = d3.scale.ordinal()
-		.rangeBands([chartHeight, 0]);
+		.rangeBands([chartWidth, 0]);
 	
 	y = d3.scale.linear()
-		.range([0, chartWidth]);
+		.range([0, chartHeight]);
 		
 	chart = chart.attr("width", Width + margin.left + margin.right)
 		.attr("height", Height + margin.top + margin.bottom)
 	  .append("g")
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+		
+	var redrawBig = function(){
+		drawHighSchoolSAT(800, 600, false);
+	};
+	var redrawSmall = function(){
+		drawHighSchoolSAT(300, 300, true);
+	};
+	SATGraphTransition = function(toBigGraph){
+		if(!toBigGraph){
+			chart.transition()
+				.duration(750)
+				.attr("transform", "scale(0.375, 0.5)")
+				.each("end", redrawSmall);
+			d3.select("#HighSchoolSATScores").select('svg')
+				.transition()
+				.duration(750)
+				.attr("height", 300)
+				.attr("width", 300)
+				.remove();
+			d3.select("#HighSchoolSATScores")
+				.transition()
+				.duration(750)
+				.style("left", d3.select('#'+mainGraph).style("left"))
+				.style("top", d3.select('#'+mainGraph).style("top"));
+		}else{
+			chart.transition()
+				.duration(750)
+				.attr("transform", "scale(2.6666, 2)")
+				.each("end", redrawBig);
+			d3.select("#HighSchoolSATScores").select('svg')
+				.transition()
+				.duration(750)
+				.attr("height", 600)
+				.attr("width", 800)
+				.remove();
+			d3.select("#HighSchoolSATScores")
+				.transition()
+				.duration(750)
+				.style("left", '300px')
+				.style("top", '35px');
+		}
+	}
 		
 	var drawChart = function(){
 		// Compute the x-domain by name of highschools and y-domain by top
@@ -39,7 +81,7 @@ function drawHighSchoolSAT(Width, Height, SmallChart){
 		color.domain([0, 1, 2]);
 
 		// Add a group for each status
-		var masterBars = chart.append("g").attr("transform", "translate(0, 290)scale(1, -1)");
+		var masterBars = chart.append("g").attr("transform", "translate(0, "+(SmallChart?290:590)+")scale(1, 1)");
 		var status = masterBars.selectAll("g.status")
 			.data(HighSchoolSATRolledup)
 		  .enter().append("g")
@@ -50,7 +92,7 @@ function drawHighSchoolSAT(Width, Height, SmallChart){
 			.data(Object)
 		  .enter().append("rect")
 			.attr("x", function(d) {(SATRectContainer[d.x]==undefined) ? SATRectContainer[d.x] = [this] : SATRectContainer[d.x].push(this); return x(d.x);})
-			.attr("y", function(d) {return y(d.y0);})
+			.attr("y", function(d) {return -y(d.y0) - y(d.y); })//y(d.y0);})
 			.attr("height", function(d) {return y(d.y);})
 			.attr("width", x.rangeBand())
 			.on("mouseover", function(d) {
@@ -65,19 +107,46 @@ function drawHighSchoolSAT(Width, Height, SmallChart){
 						.style("text-anchor", "middle")
 						.style("font", "10px sans-serif")
 						.style("fill", "black")
-						.text(function() {return d.x + " " + (d.y) ;});
+						.text(function() {return d.x + " " + Math.round(d.y) ;});
 				}
 				highlightedHighSchool = d3.select(this)[0]['0'].__data__.x;
 				
 				updateGraphs(d.x); 
 			})
 			.on("mouseout", function(d){
-				//masterBars.selectAll("text").remove();
+				masterBars.selectAll("text").remove();
 				//SATRectContainer[d.x].forEach(function(g, i){
 					//d3.select(g)
 						//.attr("fill", color(i));
 				//});
 				updateGraphs(null, d.x);
+			})
+			.on("mousedown", function(d){
+				if(SmallChart){
+					switch(mainGraph){
+						case "HighSchoolGPA":
+							SATGraphTransition(true);
+							mainGraph = "HighSchoolSATScores";
+							GPAGraphTransition(false);
+						break;
+						case "completion":
+							SATGraphTransition(true);
+							mainGraph = "HighSchoolSATScores";
+							CompletionGraphTransition(false);
+						break;
+					}
+					
+				}
+			});
+			
+			rect.append("title").text(function(d){
+				var finalString = d.x + "\n";
+				var someInt = 0;
+				SATRectContainer[d.x].forEach(function(g, i){
+					finalString += i==0?"Average SAT Math: ":(i==1?"Average SAT Verbal: ":"Average SAT Written: ");
+					finalString += Math.round(someInt = d3.select(g)[0]['0'].__data__.y) + (someInt==0?" :(":"") +"\n";
+				});
+				return finalString + globalInfo[((d.x == "North Springs Charter Hs") ? "North Springs High School":d.x)].percentageAccepted + "% Acceptance rate";
 			});
 	}
 		
@@ -116,5 +185,7 @@ function drawHighSchoolSAT(Width, Height, SmallChart){
 			HighSchoolSATRolledup = SATStack;
 			drawChart();
 		});
+	}else{
+		drawChart();
 	}
 }

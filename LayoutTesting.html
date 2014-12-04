@@ -5,9 +5,10 @@
 <meta charset="UTF-8">
 <title>D3 Final Project</title>
 <script src="lib/d3.js"></script>
-<script src="js/completionrate.js"></script>
 <script src="js/HighSchoolData - HorizontalBarChart.js"></script>
+<script src="js/completionrate.js"></script>
 <script src="js/HighSchoolData - SATStackedBarChart.js"></script>
+<script src="js/HighSchoolData - acceptanceRate.js"></script>
 
 <style>
 .axis path,
@@ -53,7 +54,7 @@
 </style>
 </head>
 
-<body onload="drawcompletionrate(300, 300, true); drawSchoolGPAChart(800, 600, false); drawHighSchoolSAT(300, 300, true); mainGraph='GPA'">
+<body onload="collectAcceptanceRate(); drawcompletionrate(800, 600, false); drawSchoolGPAChart(300, 300, true); drawHighSchoolSAT(300, 300, true); mainGraph='completion'">
 
 <div id="header">
 Demographics / Highschools
@@ -64,12 +65,12 @@ Demographics / Highschools
 		<div id="HighSchoolSATScores" style="position:absolute"></div>
 	</div>
 	<div class="minigraph">
-		<div id="completion" style="position:absolute"></div>
+		<div id="HighSchoolGPA" style="position:absolute"></div>
 	</div>
 </div>
 
 <div id="MainGraph">
-	<div id="HighSchoolGPA" style="position:absolute"></div>
+	<div id="completion" style="position:absolute"></div>
 </div>
 
 <div style="clear: both; width: 1100px;"></div>

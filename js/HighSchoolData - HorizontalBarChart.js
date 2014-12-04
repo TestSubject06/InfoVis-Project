@@ -6,6 +6,13 @@ var HighSchoolGPARects = new Object();
 var smallGraphDivName;
 var largeGraphDivName;
 var mainGraph;
+var globalInfo;
+
+//Function handlers for the three different graphs
+var GPAGraphTransition;
+var SATGraphTransition;
+var CompletionGraphTransition;
+
 function drawSchoolGPAChart(Width, Height, SmallChart){
 	HighSchoolGPARects = new Object();
 	var chart;
@@ -40,6 +47,48 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 		.attr("height", height + margin.top + margin.bottom)
 	  .append("g")
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	
+	var redrawBig = function(){
+		drawSchoolGPAChart(800, 600, false);
+	};
+	var redrawSmall = function(){
+		drawSchoolGPAChart(300, 300, true);
+	};
+	GPAGraphTransition = function(toBigGraph){
+		if(!toBigGraph){
+			chart.transition()
+				.duration(750)
+				.attr("transform", "scale(0.375, 0.5)")
+				.each("end", redrawSmall);
+			d3.select("#HighSchoolGPA").select('svg')
+				.transition()
+				.duration(750)
+				.attr("height", 300)
+				.attr("width", 300)
+				.remove();
+			d3.select("#HighSchoolGPA")
+				.transition()
+				.duration(750)
+				.style("left", d3.select('#'+mainGraph).style("left"))
+				.style("top", d3.select('#'+mainGraph).style("top"));
+		}else{
+			chart.transition()
+				.duration(750)
+				.attr("transform", "translate(150, 0)scale(2.6666, 2)")
+				.each("end", redrawBig);
+			d3.select("#HighSchoolGPA").select('svg')
+				.transition()
+				.duration(750)
+				.attr("height", 600)
+				.attr("width", 800)
+				.remove();
+			d3.select("#HighSchoolGPA")
+				.transition()
+				.duration(750)
+				.style("left", '300px')
+				.style("top", '35px');
+		}
+	}
 		
 	var drawChart = function(){
 		x.domain([d3.min(HighSchoolAverageGPARollupData, function(d) {return d.values;})-0.05, d3.max(HighSchoolAverageGPARollupData, function(d){return d.values;})]);
@@ -83,8 +132,22 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 				bar.selectAll("rect").attr("fill", function(d){return (selectedHighSchools.indexOf(d.key)>=0) ? "steelblue" : "black";});
 				
 				if(SmallChart){
-					swapCharts(chart);
+					switch(mainGraph){
+						case "completion":
+							GPAGraphTransition(true);
+							mainGraph = "HighSchoolGPA";
+							CompletionGraphTransition(false);
+						break;
+						case "HighSchoolSATScores":
+							GPAGraphTransition(true);
+							mainGraph = "HighSchoolGPA";
+							SATGraphTransition(false);
+						break;
+					}
 				}
+			})
+			.append("title").text(function(d){
+				return d.key + "\n" + "Average GPA: " + Math.round(d.values*100)/100 + "\n" + globalInfo[((d.key == "North Springs Charter Hs") ? "North Springs High School":d.key)].percentageAccepted + "% Acceptance rate";
 			});
 		
 		if(!SmallChart)	{
@@ -123,34 +186,5 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 	}
 }
 
-function displaySmallGraph(){
-	drawSchoolGPAChart(300, 300, true);
-}
-
 //Make a set of global function handles, and then define them in each of the functions.
 //Then use these function handles to move the charts around
-//This doesn't work yet
-function swapGraphs(toLargeGraph){
-	//Take the small graph and move it to the big graph spot, and scale it up.
-	toLargeGraph.transition()
-		.duration(750)
-		.attr("transform", "scale(2.6667, 2)")
-		.each("end", displayLargeGraph);
-	
-	//Take the large graph, and move it to the little spot, and scale it down.
-	toSmallGraph.transition()
-		.duration(750)
-		.attr("transform", "scale(0.375, 0.5)")
-		.each("end", displaySmallGraph);
-	d3.select(largeGraphDivName).select('svg')
-		.transition()
-		.duration(750)
-		.attr("height", 300)
-		.attr("width", 300)
-		.remove();
-	d3.select(largeGraphDivName)
-		.transition()
-		.duration(750)
-		.style("left", d3.select('#completion').style("left"))
-		.style("top", d3.select('#completion').style("top"));
-}
