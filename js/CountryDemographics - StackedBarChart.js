@@ -55,7 +55,7 @@ function drawCountryChart(Width, Height){
 			return{
 				country: country,
 				values: data.map(function(d) {
-					return {year: d.year, y: (country!="United States of America" && country!="China" && country != "India" && country != "Korea, Republic of (South)")?+d[country]:0};
+					return {year: d.year, y: (country!="United States of America")?+d[country]:0};
 				})
 			};
 		}));
@@ -63,8 +63,8 @@ function drawCountryChart(Width, Height){
 		y.domain([0, d3.max(data, function(d){
 			var sum = 0;
 			for (var property in d) {
-				if(property != "year" && property != "United States of America" && property!="China" && property != "India" && property != "Korea, Republic of (South)")
-					sum += +d[property];
+				if(property != "year" && property != "United States of America")// && property!="China" && property != "India" && property != "Korea, Republic of (South)")
+				sum += +d[property];
 			}
 			return sum;
 		})]);

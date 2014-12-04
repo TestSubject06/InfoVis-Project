@@ -194,6 +194,3 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 		drawChart();
 	}
 }
-
-//Make a set of global function handles, and then define them in each of the functions.
-//Then use these function handles to move the charts around
