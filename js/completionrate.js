@@ -140,13 +140,15 @@ function drawcompletionrate(Width, Height, SmallChart){
 				
 			svg.append("text")
 				 .text("Number of graduated and not graduated students in Georgia Institute of Technology by high schools")
-				 .attr("x", 70)
-				 .attr("y", 13);
+				 .attr("x", 5)
+				 .attr("y", 13)
+				 .style("font-size", "12px");
 
 			svg.append("text")
 			 .text("Hover over bar to see exact value, color: Grey = Graduated, Blue = Not Graduated")
-			 .attr("x", 100)
-			 .attr("y", 27);
+			 .attr("x", 5)
+			 .attr("y", 27)
+			 .style("font-size", "12px");
 		}
 	}
 
@@ -157,17 +159,17 @@ function drawcompletionrate(Width, Height, SmallChart){
   	  	.attr("transform", "translate(" + p[3] + "," + (h - p[2]) + ")");
 		
 	var redrawBig = function(){
-		drawcompletionrate(800, 600, false);
+		drawcompletionrate(640, 480, false);
 	};
 	var redrawSmall = function(){
-		drawcompletionrate(300, 300, true);
+		drawcompletionrate(200, 240, true);
 	};
 	CompletionGraphTransition = function(toBigGraph){
 		if(!toBigGraph){
 			d3.select("#completion").select('svg').transition()
 				.duration(750)
-				.attr("height", 300)
-				.attr("width", 300)
+				.attr("height", 240)
+				.attr("width", 200)
 				.attr("transform", "scale(0.375, 0.5)")
 				.each("end", redrawSmall)
 				.remove();
@@ -179,16 +181,16 @@ function drawcompletionrate(Width, Height, SmallChart){
 		}else{
 			d3.select("#completion").select('svg').transition()
 				.duration(750)
-				.attr("height", 600)
-				.attr("width", 800)
+				.attr("height", 480)
+				.attr("width", 640)
 				.attr("transform", "scale(2.6666, 2)")
 				.each("end", redrawBig)
 				.remove();
 			d3.select("#completion")
 				.transition()
 				.duration(750)
-				.style("left", '300px')
-				.style("top", '35px');
+				.style("left", '200px')
+				.style("top", '30px');
 		}
 		console.log(d3.select('#'+mainGraph).style("top"));
 	}
@@ -264,6 +266,11 @@ function updateGraphs(newHover = null, oldHover = null, newSelection = null){
 			d3.select(g)
 				.attr("fill", "red");
 		});
+		
+		HighSchoolNameBoxRects[newHover].forEach(function(g, i){
+			d3.select(g)
+				.attr("fill", "pink");
+		});
 	}
 	
 	if(oldHover != null){
@@ -281,6 +288,11 @@ function updateGraphs(newHover = null, oldHover = null, newSelection = null){
 		HighSchoolGPARects[oldHover].forEach(function(g, i){
 			d3.select(g)
 				.attr("fill", "black");
+		});
+		
+		HighSchoolNameBoxRects[oldHover].forEach(function(g, i){
+			d3.select(g)
+				.attr("fill", "white");
 		});
 	}
 }

@@ -2,6 +2,7 @@
 var selectedHighSchools = [""];
 var highlightedHighSchool = "";
 var HighSchoolAverageGPARollupData = null;
+var HighSchoolSpecialRollupData = null;
 var HighSchoolGPARects = new Object();
 var smallGraphDivName;
 var largeGraphDivName;
@@ -43,16 +44,16 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 	x = d3.scale.linear()
 		.range([0, chartWidth]);
 	
-	chart = chart.attr("width", width + margin.left + margin.right)
-		.attr("height", height + margin.top + margin.bottom)
+	chart = chart.attr("width", width)
+		.attr("height", height)
 	  .append("g")
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 	
 	var redrawBig = function(){
-		drawSchoolGPAChart(800, 600, false);
+		drawSchoolGPAChart(640, 480, false);
 	};
 	var redrawSmall = function(){
-		drawSchoolGPAChart(300, 300, true);
+		drawSchoolGPAChart(200, 240, true);
 	};
 	GPAGraphTransition = function(toBigGraph){
 		if(!toBigGraph){
@@ -63,8 +64,8 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 			d3.select("#HighSchoolGPA").select('svg')
 				.transition()
 				.duration(750)
-				.attr("height", 300)
-				.attr("width", 300)
+				.attr("height", 240)
+				.attr("width", 200)
 				.remove();
 			d3.select("#HighSchoolGPA")
 				.transition()
@@ -79,14 +80,14 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 			d3.select("#HighSchoolGPA").select('svg')
 				.transition()
 				.duration(750)
-				.attr("height", 600)
-				.attr("width", 800)
+				.attr("height", 480)
+				.attr("width", 640)
 				.remove();
 			d3.select("#HighSchoolGPA")
 				.transition()
 				.duration(750)
-				.style("left", '300px')
-				.style("top", '35px');
+				.style("left", '200px')
+				.style("top", '30px');
 		}
 	}
 		
@@ -175,11 +176,13 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 					});
 				})
 				.entries(data);
-				
+			
+			HighSchoolSpecialRollupData = averageGPAs.slice(0);
 			averageGPAs.sort(function (a,b){return a.values-b.values});
 			
 			HighSchoolAverageGPARollupData = averageGPAs;
 			drawChart();
+			drawNameBoxes();
 		});
 	}else{
 		drawChart();

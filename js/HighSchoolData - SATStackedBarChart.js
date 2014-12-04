@@ -27,16 +27,16 @@ function drawHighSchoolSAT(Width, Height, SmallChart){
 	y = d3.scale.linear()
 		.range([0, chartHeight]);
 		
-	chart = chart.attr("width", Width + margin.left + margin.right)
-		.attr("height", Height + margin.top + margin.bottom)
+	chart = chart.attr("width", Width)
+		.attr("height", Height)
 	  .append("g")
 		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 		
 	var redrawBig = function(){
-		drawHighSchoolSAT(800, 600, false);
+		drawHighSchoolSAT(640, 480, false);
 	};
 	var redrawSmall = function(){
-		drawHighSchoolSAT(300, 300, true);
+		drawHighSchoolSAT(200, 240, true);
 	};
 	SATGraphTransition = function(toBigGraph){
 		if(!toBigGraph){
@@ -47,8 +47,8 @@ function drawHighSchoolSAT(Width, Height, SmallChart){
 			d3.select("#HighSchoolSATScores").select('svg')
 				.transition()
 				.duration(750)
-				.attr("height", 300)
-				.attr("width", 300)
+				.attr("height", 240)
+				.attr("width", 200)
 				.remove();
 			d3.select("#HighSchoolSATScores")
 				.transition()
@@ -63,14 +63,14 @@ function drawHighSchoolSAT(Width, Height, SmallChart){
 			d3.select("#HighSchoolSATScores").select('svg')
 				.transition()
 				.duration(750)
-				.attr("height", 600)
-				.attr("width", 800)
+				.attr("height", 480)
+				.attr("width", 640)
 				.remove();
 			d3.select("#HighSchoolSATScores")
 				.transition()
 				.duration(750)
-				.style("left", '300px')
-				.style("top", '35px');
+				.style("left", '200px')
+				.style("top", '30px');
 		}
 	}
 		
@@ -81,7 +81,7 @@ function drawHighSchoolSAT(Width, Height, SmallChart){
 		color.domain([0, 1, 2]);
 
 		// Add a group for each status
-		var masterBars = chart.append("g").attr("transform", "translate(0, "+(SmallChart?290:590)+")scale(1, 1)");
+		var masterBars = chart.append("g").attr("transform", "translate(0, "+chartHeight+")scale(1, 1)");
 		var status = masterBars.selectAll("g.status")
 			.data(HighSchoolSATRolledup)
 		  .enter().append("g")
