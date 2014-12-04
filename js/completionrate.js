@@ -55,6 +55,10 @@ function drawcompletionrate(Width, Height, SmallChart){
 				updateGraphs(null, d.x);
 			})
 			.on("mousedown", function(d){
+				if(!SmallChart){
+					globalHighSchoolSelections[d.x] = !globalHighSchoolSelections[d.x];
+					updateGraphs(null, null, d.x);
+				}
 				if(SmallChart){
 					switch(mainGraph){
 						case "HighSchoolGPA":
@@ -82,6 +86,13 @@ function drawcompletionrate(Width, Height, SmallChart){
 				finalString += "Total students: " + total + "\n";
 				return finalString + globalInfo[((d.x == "North Springs Charter Hs") ? "North Springs High School":d.x)].percentageAccepted + "% Acceptance rate";
 			});
+			for (var property in HighSchoolGraduationRects) {
+				HighSchoolGraduationRects[property].forEach(function(g, i){
+					d3.select(g)
+						.attr("fill", globalHighSchoolSelections[property]?d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)).brighter():d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)))
+						.attr("stroke", globalHighSchoolSelections[property]?d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)):d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)).darker());
+				})
+			};
 			// .on("click", function(d){
 			// 	sortChart();
 			// });	
@@ -258,8 +269,8 @@ function updateGraphs(newHover = null, oldHover = null, newSelection = null){
 		
 		HighSchoolGraduationRects[newHover].forEach(function(g, i){
 			d3.select(g)
-				.attr("fill", d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"])(i)).brighter())
-				.attr("stroke", d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"])(i)));
+				.attr("fill", d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)).brighter().brighter())
+				.attr("stroke", d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)).brighter());
 		});
 		
 		HighSchoolGPARects[newHover].forEach(function(g, i){
@@ -276,23 +287,45 @@ function updateGraphs(newHover = null, oldHover = null, newSelection = null){
 	if(oldHover != null){
 		SATRectContainer[oldHover].forEach(function(g, i){
 			d3.select(g)
-				.attr("fill", d3.rgb(d3.scale.category10().domain([0, 1, 2])(i)));
+				.attr("fill", globalHighSchoolSelections[oldHover]?d3.rgb(d3.scale.category10().domain([0, 1, 2])(i)).brighter():d3.rgb(d3.scale.category10().domain([0, 1, 2])(i)));
 		});
 		
 		HighSchoolGraduationRects[oldHover].forEach(function(g, i){
 			d3.select(g)
-				.attr("fill", d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)))
-				.attr("stroke", d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)).darker());
+				.attr("fill", globalHighSchoolSelections[oldHover]?d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)).brighter():d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)))
+				.attr("stroke", globalHighSchoolSelections[oldHover]?d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)):d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)).darker());
 		});
 		
 		HighSchoolGPARects[oldHover].forEach(function(g, i){
 			d3.select(g)
-				.attr("fill", "black");
+				.attr("fill", globalHighSchoolSelections[oldHover]?"steelblue":"black");
 		});
 		
 		HighSchoolNameBoxRects[oldHover].forEach(function(g, i){
 			d3.select(g)
-				.attr("fill", "white");
+				.attr("fill", globalHighSchoolSelections[oldHover]?"steelblue":"white");
+		});
+	}
+	if(newSelection != null){
+		SATRectContainer[newSelection].forEach(function(g, i){
+			d3.select(g)
+				.attr("fill", globalHighSchoolSelections[newSelection]?d3.rgb(d3.scale.category10().domain([0, 1, 2])(i)).brighter():d3.rgb(d3.scale.category10().domain([0, 1, 2])(i)));
+		});
+		
+		HighSchoolGraduationRects[newSelection].forEach(function(g, i){
+			d3.select(g)
+				.attr("fill", globalHighSchoolSelections[newSelection]?d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)).brighter():d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)))
+				.attr("stroke", globalHighSchoolSelections[newSelection]?d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)):d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)).darker());
+		});
+		
+		HighSchoolGPARects[newSelection].forEach(function(g, i){
+			d3.select(g)
+				.attr("fill", globalHighSchoolSelections[newSelection]?"steelblue":"black");
+		});
+		
+		HighSchoolNameBoxRects[newSelection].forEach(function(g, i){
+			d3.select(g)
+				.attr("fill", globalHighSchoolSelections[newSelection]?"steelblue":"white");
 		});
 	}
 }

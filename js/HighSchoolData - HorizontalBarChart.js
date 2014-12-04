@@ -8,6 +8,7 @@ var smallGraphDivName;
 var largeGraphDivName;
 var mainGraph;
 var globalInfo;
+var globalHighSchoolSelections = new Object();
 
 //Function handlers for the three different graphs
 var GPAGraphTransition;
@@ -104,7 +105,7 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 		bar.append("rect")
 			.attr("width", function(d){(HighSchoolGPARects[d.key]==undefined) ? HighSchoolGPARects[d.key] = [this] : HighSchoolGPARects[d.key].push(this); return x(d.values);})
 			.attr("height", y.rangeBand())
-			.attr("fill", function(d){return (selectedHighSchools.indexOf(d.key)>=0) ? "steelblue" : "black";})
+			.attr("fill", function(d){return globalHighSchoolSelections[d.key]? "steelblue" : "black";})
 			.on("mouseover", function(d){
 				d3.select(this)
 					.attr("fill", "red");
@@ -127,11 +128,11 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 				bar.select("text").remove();
 				updateGraphs(null, d.key);
 			})
-			.on("mousedown", function(){
-				d3.select(this)
-					.attr("fill", function(d){selectedHighSchools[0] = d.key; return "steelblue"});
-				bar.selectAll("rect").attr("fill", function(d){return (selectedHighSchools.indexOf(d.key)>=0) ? "steelblue" : "black";});
-				
+			.on("mousedown", function(d){
+				if(!SmallChart){
+					globalHighSchoolSelections[d.key] = !globalHighSchoolSelections[d.key];
+					updateGraphs(null, null, d.key);
+				}
 				if(SmallChart){
 					switch(mainGraph){
 						case "completion":
@@ -178,6 +179,11 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 				.entries(data);
 			
 			HighSchoolSpecialRollupData = averageGPAs.slice(0);
+			
+			HighSchoolSpecialRollupData.forEach(function(g, i){
+				globalHighSchoolSelections[g.key] = false;
+			});
+			
 			averageGPAs.sort(function (a,b){return a.values-b.values});
 			
 			HighSchoolAverageGPARollupData = averageGPAs;

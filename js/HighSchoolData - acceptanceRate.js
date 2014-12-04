@@ -45,44 +45,27 @@ function drawNameBoxes(){
 	var rects = nameBoxes.append('rect')
 			.attr("width", "100px")
 			.attr("height", "11px")
-			.attr("y", function(d, i){(HighSchoolNameBoxRects[d.key]==undefined) ? HighSchoolNameBoxRects[d.key] = [this] : HighSchoolNameBoxRects[d.key].push(this); return (i%23)*11+6;})
-			.attr("x", function(d, i){return Math.floor(i/23)*103;})
+			.attr("y", function(d, i){(HighSchoolNameBoxRects[d.key]==undefined) ? HighSchoolNameBoxRects[d.key] = [this] : HighSchoolNameBoxRects[d.key].push(this); return (i%23)*11+3;})
+			.attr("x", function(d, i){return Math.floor(i/23)*105;})
 			.attr("fill", function(d){return "white";})
 			.on("mouseover", function(d){
-				//d3.select(this)
-					//.attr("fill", "red");
-					
-				//d3.select(this.parentNode)
-					//.append("text")
-					//.attr("transform", "translate(-5, 5)")
-					//.style("text-anchor", "end")
-					//.style("font", "10px sans-serif")
-					//.style("fill", "blue")
-					//.text(function(d){return d.key;});
-					
-				//highlightedHighSchool = d3.select(this)[0]['0'].__data__.key;
 				updateGraphs(d.key);
 			})
 			.on("mouseout", function(d){
-				//d3.select(this)
-					//.attr("fill", function(d){return (selectedHighSchools.indexOf(d.key)>=0) ? "steelblue" : "black";});
-					
-				//bar.select("text").remove();
 				updateGraphs(null, d.key);
 			})
-			.on("mousedown", function(){
-				//d3.select(this)
-					//.attr("fill", function(d){selectedHighSchools[0] = d.key; return "steelblue"});
-				//bar.selectAll("rect").attr("fill", function(d){return (selectedHighSchools.indexOf(d.key)>=0) ? "steelblue" : "black";});
+			.on("mousedown", function(d){
+				globalHighSchoolSelections[d.key] = !globalHighSchoolSelections[d.key];
+				updateGraphs(null, null, d.key);
 			});
 	rects.append("title").text(function(d){
-				return d.key;
+				return d.key + "\n" + globalInfo[((d.key == "North Springs Charter Hs") ? "North Springs High School":d.key)].percentageAccepted + "% Acceptance rate";
 				//return d.key + "\n" + "Average GPA: " + Math.round(d.values*100)/100 + "\n" + globalInfo[((d.key == "North Springs Charter Hs") ? "North Springs High School":d.key)].percentageAccepted + "% Acceptance rate";
 			});
 			
 	nameBoxes.append('text')
-		.attr("y", function(d, i){(HighSchoolNameBoxRects[d.key]==undefined) ? HighSchoolNameBoxRects[d.key] = [this] : HighSchoolNameBoxRects[d.key].push(this); return (i%23)*11+16;})
-		.attr("x", function(d, i){return Math.floor(i/23)*103+1;})
+		.attr("y", function(d, i){(HighSchoolNameBoxRects[d.key]==undefined) ? HighSchoolNameBoxRects[d.key] = [this] : HighSchoolNameBoxRects[d.key].push(this); return (i%23)*11+13;})
+		.attr("x", function(d, i){return Math.floor(i/23)*105+1;})
 		.style("font", "10px sans-serif")
 		.style("fill", "black")
 		.style("pointer-events", "none")

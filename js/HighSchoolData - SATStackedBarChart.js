@@ -96,10 +96,6 @@ function drawHighSchoolSAT(Width, Height, SmallChart){
 			.attr("height", function(d) {return y(d.y);})
 			.attr("width", x.rangeBand())
 			.on("mouseover", function(d) {
-				//SATRectContainer[d.x].forEach(function(g, i){
-					//d3.select(g)
-						//.attr("fill", d3.rgb(color(i)).brighter().brighter());
-				//});
 				if(!SmallChart){
 					masterBars.append("text")
 						.attr("x", d3.mouse(this)[0])
@@ -115,13 +111,13 @@ function drawHighSchoolSAT(Width, Height, SmallChart){
 			})
 			.on("mouseout", function(d){
 				masterBars.selectAll("text").remove();
-				//SATRectContainer[d.x].forEach(function(g, i){
-					//d3.select(g)
-						//.attr("fill", color(i));
-				//});
 				updateGraphs(null, d.x);
 			})
 			.on("mousedown", function(d){
+				if(!SmallChart){
+					globalHighSchoolSelections[d.x] = !globalHighSchoolSelections[d.x];
+					updateGraphs(null, null, d.x);
+				}
 				if(SmallChart){
 					switch(mainGraph){
 						case "HighSchoolGPA":
@@ -148,6 +144,13 @@ function drawHighSchoolSAT(Width, Height, SmallChart){
 				});
 				return finalString + globalInfo[((d.x == "North Springs Charter Hs") ? "North Springs High School":d.x)].percentageAccepted + "% Acceptance rate";
 			});
+			
+			for (var property in SATRectContainer) {
+				SATRectContainer[property].forEach(function(g, i){
+					d3.select(g)
+						.attr("fill", globalHighSchoolSelections[property]?d3.rgb(d3.scale.category10().domain([0, 1, 2])(i)).brighter():d3.rgb(d3.scale.category10().domain([0, 1, 2])(i)));
+				})
+			};
 	}
 		
 	if(HighSchoolSATRolledup == null){
