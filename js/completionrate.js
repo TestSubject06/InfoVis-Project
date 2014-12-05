@@ -79,7 +79,7 @@ function drawcompletionrate(Width, Height, SmallChart){
 				var finalString = d.x + "\n";
 				var total = 0;
 				HighSchoolGraduationRects[d.x].forEach(function(g, i){
-					finalString += i==0?"Number of Non-graduated: ":"Number of Graduated: ";
+					finalString += i==0?"Number of graduated: ":"Number of Non-Graduated: ";
 					finalString += d3.select(g)[0]['0'].__data__.y + (d3.select(g)[0]['0'].__data__.y==0?" :(":"") +"\n";
 					total += d3.select(g)[0]['0'].__data__.y;
 				});
