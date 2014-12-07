@@ -5,7 +5,7 @@ function collectAcceptanceRate(){
   	var temp = {school: "", applied: "", accepted: "", percentageAccepted:"" };
   	var temp_applied, temp_accepted, temp_percentage_accepted;
 	
-  	d3.csv('data/CS4460_HighSchoolAcceptanceRates_v2.csv', function(error, data){
+  	d3.tsv('data/CS4460_HighSchoolAcceptanceRates_v2.tsv', function(error, data){
   		temp_applied = d3.nest()
 				.key(function(d)	{ return d["High School Description"];})
 				.sortKeys(d3.ascending)

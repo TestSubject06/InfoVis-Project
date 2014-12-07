@@ -1,6 +1,7 @@
 //Gets called when the page is loaded.
 var HighSchoolGraduatedData = null;
 var HighSchoolGraduationRects = new Object();
+var CompletionCurrentSorting = -1;
 function drawcompletionrate(Width, Height, SmallChart){
 	HighSchoolGraduationRects = new Object();
 	var highSchoolsGraduated;
@@ -8,10 +9,16 @@ function drawcompletionrate(Width, Height, SmallChart){
 	var stack;
 	var w = Width;
   	var h = Height;
-  	var p = SmallChart ? [5, 5, 5, 5] : [20, 50, 30, 20];
+  	var p = SmallChart ? [11, 5, 5, 5] : [20, 50, 30, 20];
   	var x = d3.scale.ordinal().rangeBands([0, w - p[1] - p[3]]);
   	var y = d3.scale.linear().range([0, h - p[0] - p[2]]);
-  	var z = d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]);
+  	var z = d3.scale.ordinal().range(["#9ecae1", "#fd8d3c"]);
+	
+	var svg = d3.select('#completion').append('svg')
+  		.attr("width", w)
+  		.attr("height", h)
+  	  .append("g")
+  	  	.attr("transform", "translate(" + p[3] + "," + (h - p[2]) + ")");
 	
 	var drawTheChart = function(){
 		// Compute the x-domain by name of highschools and y-domain by top
@@ -45,9 +52,6 @@ function drawcompletionrate(Width, Height, SmallChart){
 						.text(function() {return d.x + " " + (d.y) ;});
 				}
 				highlightedHighSchool = d3.select(this)[0]['0'].__data__.x;
-				//masterBars.selectAll("rect")
-					//.attr("fill", function(d){return d.x==highlightedHighSchool?(d.y0==0?d3.rgb(z(0)).brighter().brighter():d3.rgb(z(1)).brighter()):(d.y0==0?z(0):z(1))})
-					//.attr("stroke", function(d){return d.x==highlightedHighSchool?(d.y0==0?d3.rgb(z(0)).brighter():d3.rgb(z(1))):(d.y0==0?d3.rgb(z(0)).darker():d3.rgb(z(1)).darker());});
 				updateGraphs(d.x);
 			})
 			.on("mouseout", function(d){
@@ -56,8 +60,75 @@ function drawcompletionrate(Width, Height, SmallChart){
 			})
 			.on("mousedown", function(d){
 				if(!SmallChart){
-					globalHighSchoolSelections[d.x] = !globalHighSchoolSelections[d.x];
-					updateGraphs(null, null, d.x);
+					if(d3.event.ctrlKey){
+						//Sorting hook
+						if(HighSchoolGraduationRects[d.x].indexOf(this) == CompletionCurrentSorting){
+							HighSchoolGraduatedData[0].sort(function(b, a){
+								var indexofA = HighSchoolGraduatedData[0].indexOf(a);
+								var indexofB = HighSchoolGraduatedData[0].indexOf(b);
+								var index1 = HighSchoolGraduatedData[1].findIndex(function(c, i){
+									return c.x == a.x;
+								});
+								
+								var index2 = HighSchoolGraduatedData[1].findIndex(function(c, i){
+									return c.x == b.x;
+								});
+								return (HighSchoolGraduatedData[0][indexofA].y + HighSchoolGraduatedData[1][index1].y) - (HighSchoolGraduatedData[0][indexofB].y + HighSchoolGraduatedData[1][index2].y);
+							});
+							CompletionCurrentSorting = -1;
+						}else{
+							switch(HighSchoolGraduationRects[d.x].indexOf(this)){
+								case 0:
+									HighSchoolGraduatedData[0].sort(function(b, a){
+										var indexofA = HighSchoolGraduatedData[0].indexOf(a);
+										var indexofB = HighSchoolGraduatedData[0].indexOf(b);
+										return (HighSchoolGraduatedData[0][indexofA].y) - (HighSchoolGraduatedData[0][indexofB].y);
+									});
+									CompletionCurrentSorting = 0;
+								break;
+								
+								case 1:
+									HighSchoolGraduatedData[1].sort(function(b, a){
+										var indexofA = HighSchoolGraduatedData[1].indexOf(a);
+										var indexofB = HighSchoolGraduatedData[1].indexOf(b);
+										return (HighSchoolGraduatedData[1][indexofA].y) - (HighSchoolGraduatedData[1][indexofB].y);
+									});
+									HighSchoolGraduatedData[0].sort(function(a, b){
+										var index1 = HighSchoolGraduatedData[1].findIndex(function(c, i){
+											return c.x == a.x;
+										});
+										
+										var index2 = HighSchoolGraduatedData[1].findIndex(function(c, i){
+											return c.x == b.x;
+										});
+										
+										return index1-index2;
+									});
+									CompletionCurrentSorting = 1;
+								break;
+							}
+						}
+						d3.select("#completion").select('svg').remove();
+						redrawBig();
+					}else if(d3.event.shiftKey){
+						HighSchoolGraduatedData[0].sort(function(b, a){
+							var indexofA = HighSchoolGraduatedData[0].indexOf(a);
+							var indexofB = HighSchoolGraduatedData[0].indexOf(b);
+							var index1 = HighSchoolGraduatedData[1].findIndex(function(c, i){
+								return c.x == a.x;
+							});
+							
+							var index2 = HighSchoolGraduatedData[1].findIndex(function(c, i){
+								return c.x == b.x;
+							});
+							return (HighSchoolGraduatedData[0][indexofA].y / HighSchoolGraduatedData[1][index1].y) - (HighSchoolGraduatedData[0][indexofB].y / HighSchoolGraduatedData[1][index2].y);
+						});
+						d3.select("#completion").select('svg').remove();
+						redrawBig();
+					}else{
+						globalHighSchoolSelections[d.x] = !globalHighSchoolSelections[d.x];
+						updateGraphs(null, null, d.x);
+					}
 				}
 				if(SmallChart){
 					switch(mainGraph){
@@ -89,8 +160,8 @@ function drawcompletionrate(Width, Height, SmallChart){
 			for (var property in HighSchoolGraduationRects) {
 				HighSchoolGraduationRects[property].forEach(function(g, i){
 					d3.select(g)
-						.attr("fill", globalHighSchoolSelections[property]?d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)).brighter():d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)))
-						.attr("stroke", globalHighSchoolSelections[property]?d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)):d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)).darker());
+						.attr("fill", globalHighSchoolSelections[property]?d3.rgb(d3.scale.ordinal().range(["#9ecae1", "#fd8d3c"]).domain([0, 1])(i)).brighter():d3.rgb(d3.scale.ordinal().range(["#9ecae1", "#fd8d3c"]).domain([0, 1])(i)))
+						.attr("stroke", globalHighSchoolSelections[property]?d3.rgb(d3.scale.ordinal().range(["#9ecae1", "#fd8d3c"]).domain([0, 1])(i)):d3.rgb(d3.scale.ordinal().range(["#9ecae1", "#fd8d3c"]).domain([0, 1])(i)).darker());
 				})
 			};
 			// .on("click", function(d){
@@ -132,6 +203,14 @@ function drawcompletionrate(Width, Height, SmallChart){
 			// 	sortDir = sortDir = 'asc' ? 'desc' : 'asc';
 		// }
 
+		svg.append('text')
+			.attr('y', SmallChart?-225:-440)
+			.attr('x', w/2)
+			.style("text-anchor", "middle")
+			.style("font", "10px sans-serif")
+			.style("fill", "black")
+			.text("Graduated vs Not-graduated Students");
+		
 		if(!SmallChart){
 			var rule = svg.selectAll("g.rule")
 				.data(y.ticks(5))
@@ -162,13 +241,7 @@ function drawcompletionrate(Width, Height, SmallChart){
 			 .style("font-size", "12px");
 		}
 	}
-
-  	var svg = d3.select('#completion').append('svg')
-  		.attr("width", w)
-  		.attr("height", h)
-  	  .append("g")
-  	  	.attr("transform", "translate(" + p[3] + "," + (h - p[2]) + ")");
-		
+	
 	var redrawBig = function(){
 		drawcompletionrate(640, 480, false);
 	};
@@ -269,8 +342,8 @@ function updateGraphs(newHover = null, oldHover = null, newSelection = null){
 		
 		HighSchoolGraduationRects[newHover].forEach(function(g, i){
 			d3.select(g)
-				.attr("fill", d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)).brighter().brighter())
-				.attr("stroke", d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)).brighter());
+				.attr("fill", d3.rgb(d3.scale.ordinal().range(["#9ecae1", "#fd8d3c"]).domain([0, 1])(i)).brighter().brighter())
+				.attr("stroke", d3.rgb(d3.scale.ordinal().range(["#9ecae1", "#fd8d3c"]).domain([0, 1])(i)).brighter());
 		});
 		
 		HighSchoolGPARects[newHover].forEach(function(g, i){
@@ -292,8 +365,8 @@ function updateGraphs(newHover = null, oldHover = null, newSelection = null){
 		
 		HighSchoolGraduationRects[oldHover].forEach(function(g, i){
 			d3.select(g)
-				.attr("fill", globalHighSchoolSelections[oldHover]?d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)).brighter():d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)))
-				.attr("stroke", globalHighSchoolSelections[oldHover]?d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)):d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)).darker());
+				.attr("fill", globalHighSchoolSelections[oldHover]?d3.rgb(d3.scale.ordinal().range(["#9ecae1", "#fd8d3c"]).domain([0, 1])(i)).brighter():d3.rgb(d3.scale.ordinal().range(["#9ecae1", "#fd8d3c"]).domain([0, 1])(i)))
+				.attr("stroke", globalHighSchoolSelections[oldHover]?d3.rgb(d3.scale.ordinal().range(["#9ecae1", "#fd8d3c"]).domain([0, 1])(i)):d3.rgb(d3.scale.ordinal().range(["#9ecae1", "#fd8d3c"]).domain([0, 1])(i)).darker());
 		});
 		
 		HighSchoolGPARects[oldHover].forEach(function(g, i){
@@ -314,8 +387,8 @@ function updateGraphs(newHover = null, oldHover = null, newSelection = null){
 		
 		HighSchoolGraduationRects[newSelection].forEach(function(g, i){
 			d3.select(g)
-				.attr("fill", globalHighSchoolSelections[newSelection]?d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)).brighter():d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)))
-				.attr("stroke", globalHighSchoolSelections[newSelection]?d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)):d3.rgb(d3.scale.ordinal().range(["#fd8d3c", "#9ecae1"]).domain([0, 1])(i)).darker());
+				.attr("fill", globalHighSchoolSelections[newSelection]?d3.rgb(d3.scale.ordinal().range(["#9ecae1", "#fd8d3c"]).domain([0, 1])(i)).brighter():d3.rgb(d3.scale.ordinal().range(["#9ecae1", "#fd8d3c"]).domain([0, 1])(i)))
+				.attr("stroke", globalHighSchoolSelections[newSelection]?d3.rgb(d3.scale.ordinal().range(["#9ecae1", "#fd8d3c"]).domain([0, 1])(i)):d3.rgb(d3.scale.ordinal().range(["#9ecae1", "#fd8d3c"]).domain([0, 1])(i)).darker());
 		});
 		
 		HighSchoolGPARects[newSelection].forEach(function(g, i){

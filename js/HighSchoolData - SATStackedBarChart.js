@@ -1,9 +1,10 @@
 var HighSchoolSATRolledup = null;
 var SATRectContainer = new Object();
+var SATCurrentSortingIndex = -1;
 function drawHighSchoolSAT(Width, Height, SmallChart){
 	SATRectContainer = new Object();
 	var chart;
-	var margin = SmallChart ? {top:5, bottom:5, left:5, right:5} : {top:10, bottom:40, left:40, right:10};
+	var margin = SmallChart ? {top:11, bottom:5, left:5, right:5} : {top:11, bottom:45, left:10, right:40};
 	var chartWidth = Width-margin.left-margin.right;
 	var chartHeight = Height-margin.top-margin.bottom;
 	var x;
@@ -105,7 +106,6 @@ function drawHighSchoolSAT(Width, Height, SmallChart){
 						.style("fill", "black")
 						.text(function() {return d.x + " " + Math.round(d.y) ;});
 				}
-				highlightedHighSchool = d3.select(this)[0]['0'].__data__.x;
 				
 				updateGraphs(d.x); 
 			})
@@ -115,8 +115,92 @@ function drawHighSchoolSAT(Width, Height, SmallChart){
 			})
 			.on("mousedown", function(d){
 				if(!SmallChart){
-					globalHighSchoolSelections[d.x] = !globalHighSchoolSelections[d.x];
-					updateGraphs(null, null, d.x);
+					if(d3.event.ctrlKey){
+						//Sorting hook
+						if(SATRectContainer[d.x].indexOf(this) == SATCurrentSortingIndex){
+							HighSchoolSATRolledup[0].sort(function(a, b){
+								var indexofA = HighSchoolSATRolledup[0].indexOf(a);
+								var indexofB = HighSchoolSATRolledup[0].indexOf(b);
+								var index1 = HighSchoolSATRolledup[1].findIndex(function(c, i){
+									return c.x == a.x;
+								});
+								
+								var index2 = HighSchoolSATRolledup[1].findIndex(function(c, i){
+									return c.x == b.x;
+								});
+								var index3 = HighSchoolSATRolledup[2].findIndex(function(c, i){
+									return c.x == a.x;
+								});
+								
+								var index4 = HighSchoolSATRolledup[2].findIndex(function(c, i){
+									return c.x == b.x;
+								});
+								return (HighSchoolSATRolledup[0][indexofA].y + HighSchoolSATRolledup[1][index1].y + HighSchoolSATRolledup[2][index3].y) - (HighSchoolSATRolledup[0][indexofB].y + HighSchoolSATRolledup[1][index2].y + HighSchoolSATRolledup[2][index4].y);
+							});
+							SATCurrentSortingIndex = -1;
+						}else{
+							switch(SATRectContainer[d.x].indexOf(this)){
+								case 0:
+									//Sort by SAT Math
+									HighSchoolSATRolledup[0].sort(function(a, b){
+										var indexofA = HighSchoolSATRolledup[0].indexOf(a);
+										var indexofB = HighSchoolSATRolledup[0].indexOf(b);
+										return (HighSchoolSATRolledup[0][indexofA].y) - (HighSchoolSATRolledup[0][indexofB].y);
+									});
+									SATCurrentSortingIndex = 0;
+								break;
+								
+								case 1:
+									//Sort by SAT Verbal
+									HighSchoolSATRolledup[1].sort(function(a, b){
+										var indexofA = HighSchoolSATRolledup[1].indexOf(a);
+										var indexofB = HighSchoolSATRolledup[1].indexOf(b);
+										return (HighSchoolSATRolledup[1][indexofA].y) - (HighSchoolSATRolledup[1][indexofB].y);
+									});
+									//Match HighSchoolSATRolledup[0] to this order.
+									HighSchoolSATRolledup[0].sort(function(a, b){
+										var index1 = HighSchoolSATRolledup[1].findIndex(function(c, i){
+											return c.x == a.x;
+										});
+										
+										var index2 = HighSchoolSATRolledup[1].findIndex(function(c, i){
+											return c.x == b.x;
+										});
+										
+										return index1-index2;
+									});
+									SATCurrentSortingIndex = 1;
+								break;
+								
+								case 2:
+									//Sort by SAT Writing
+									HighSchoolSATRolledup[2].sort(function(a, b){
+										var indexofA = HighSchoolSATRolledup[2].indexOf(a);
+										var indexofB = HighSchoolSATRolledup[2].indexOf(b);
+										return (HighSchoolSATRolledup[2][indexofA].y) - (HighSchoolSATRolledup[2][indexofB].y);
+									});
+									//Match HighSchoolSATRolledup[0] to this order.
+									HighSchoolSATRolledup[0].sort(function(a, b){
+										var index1 = HighSchoolSATRolledup[2].findIndex(function(c, i){
+											return c.x == a.x;
+										});
+										
+										var index2 = HighSchoolSATRolledup[2].findIndex(function(c, i){
+											return c.x == b.x;
+										});
+										
+										return index1-index2;
+									});
+									SATCurrentSortingIndex = 2;
+								break;
+							}
+						}
+						d3.select("#HighSchoolSATScores").select('svg').remove();
+						redrawBig();
+					}else{
+						globalHighSchoolSelections[d.x] = !globalHighSchoolSelections[d.x];
+						updateGraphs(null, null, d.x);
+					}
 				}
 				if(SmallChart){
 					switch(mainGraph){
@@ -151,6 +235,33 @@ function drawHighSchoolSAT(Width, Height, SmallChart){
 						.attr("fill", globalHighSchoolSelections[property]?d3.rgb(d3.scale.category10().domain([0, 1, 2])(i)).brighter():d3.rgb(d3.scale.category10().domain([0, 1, 2])(i)));
 				})
 			};
+			
+			chart.append('text')
+			.attr('y', 0)
+			.attr('x', Width/2)
+			.style("text-anchor", "middle")
+			.style("font", "10px sans-serif")
+			.style("fill", "black")
+			.text("Average SAT Scores per High School")
+			
+			//Axes for this chart
+			if(!SmallChart){
+				var rule = chart.selectAll("g.rule")
+					.data(y.ticks(5))
+				  .enter().append("svg:g")
+					.attr("class", "rule")
+					.attr("transform", function(d) {return "translate(0," + y(2147-d) + ")";});
+
+				rule.append("svg:line")
+					.attr("x2", Width - margin.left - margin.right)
+					.style("stroke", function(d) {return d ? "#fff" : "#000";})
+					.style("stroke-opacity", function(d) {return d ? .7 : null;});
+
+				rule.append("svg:text")
+					.attr("x", Width - margin.left - margin.right + 6)
+					.attr("dy", ".35em")
+					.text(d3.format(",d"));
+			}
 	}
 		
 	if(HighSchoolSATRolledup == null){
@@ -174,17 +285,6 @@ function drawHighSchoolSAT(Width, Height, SmallChart){
 				return (SATStack[0][indexofA].y + SATStack[1][indexofA].y + SATStack[2][indexofA].y) - (SATStack[0][indexofB].y + SATStack[1][indexofB].y + SATStack[2][indexofB].y);
 			});
 			
-			SATStack[1].sort(function(a, b){
-				var indexofA = SATStack[1].indexOf(a);
-				var indexofB = SATStack[1].indexOf(b);
-				return (SATStack[0][indexofA].y + SATStack[1][indexofA].y + SATStack[2][indexofA].y) - (SATStack[0][indexofB].y + SATStack[1][indexofB].y + SATStack[2][indexofB].y);
-			});
-			
-			SATStack[2].sort(function(a, b){
-				var indexofA = SATStack[2].indexOf(a);
-				var indexofB = SATStack[2].indexOf(b);
-				return (SATStack[0][indexofA].y + SATStack[1][indexofA].y + SATStack[2][indexofA].y) - (SATStack[0][indexofB].y + SATStack[1][indexofB].y + SATStack[2][indexofB].y);
-			});
 			HighSchoolSATRolledup = SATStack;
 			drawChart();
 		});

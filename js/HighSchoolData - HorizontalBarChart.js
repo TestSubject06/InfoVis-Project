@@ -24,7 +24,7 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 	var x;
 	var xAxisLabel;
 	var yAxisLabel;
-	var margin = SmallChart ? {top:5, right:5, bottom:5, left:5} : {top: 10, right: 10, bottom: 30, left: 150};
+	var margin = SmallChart ? {top:11, right:5, bottom:0, left:5} : {top: 11, right: 10, bottom: 30, left: 150};
 	var chartWidth = width - margin.left - margin.right;
 	var chartHeight = height - margin.top - margin.bottom;
 	var color = d3.scale.category10();
@@ -151,6 +151,14 @@ function drawSchoolGPAChart(Width, Height, SmallChart){
 			.append("title").text(function(d){
 				return d.key + "\n" + "Average GPA: " + Math.round(d.values*100)/100 + "\n" + globalInfo[((d.key == "North Springs Charter Hs") ? "North Springs High School":d.key)].percentageAccepted + "% Acceptance rate";
 			});
+			
+		chart.append('text')
+			.attr('y', -2)
+			.attr('x', width/3)
+			.style("text-anchor", "middle")
+			.style("font", "10px sans-serif")
+			.style("fill", "black")
+			.text("Average GPA per High School");
 		
 		if(!SmallChart)	{
 			xAxis = d3.svg.axis()
